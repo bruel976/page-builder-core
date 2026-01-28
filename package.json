@@ -1,0 +1,37 @@
+{
+  "name": "@sirel/page-builder",
+  "version": "0.1.0",
+  "description": "React page builder renderer and types",
+  "license": "MIT",
+  "author": "",
+  "private": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean",
+    "dev": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --watch",
+    "lint": "echo \"(add lint)\""
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "tsup": "^8.0.1",
+    "typescript": "^5.4.5"
+  }
+}
