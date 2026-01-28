@@ -20,22 +20,10 @@ import {
 
 export type BlockComponent<T extends Block = Block> = React.ComponentType<{ block: T }>;
 
+type BlockOfType<TType extends BlockType> = Extract<Block, { type: TType }>;
+
 export type BlockComponentMap = {
-  hero: BlockComponent;
-  text: BlockComponent;
-  stats: BlockComponent;
-  image: BlockComponent;
-  faq: BlockComponent;
-  split: BlockComponent;
-  gallery: BlockComponent;
-  testimonials: BlockComponent;
-  cta: BlockComponent;
-  iconList: BlockComponent;
-  timeline: BlockComponent;
-  video: BlockComponent;
-  divider: BlockComponent;
-  spacer: BlockComponent;
-  composed: BlockComponent;
+  [Key in BlockType]: BlockComponent<BlockOfType<Key>>;
 };
 
 const defaultComponents: BlockComponentMap = {
@@ -68,8 +56,11 @@ function resolveBlocks(content: PageContent | Block[]): Block[] {
   return Array.isArray(content) ? content : content.blocks ?? [];
 }
 
-function resolveComponent(type: BlockType, overrides?: Partial<BlockComponentMap>): BlockComponent | null {
-  return overrides?.[type] ?? defaultComponents[type] ?? null;
+function resolveComponent<TType extends BlockType>(
+  type: TType,
+  overrides?: Partial<BlockComponentMap>,
+): BlockComponent<BlockOfType<TType>> | null {
+  return (overrides?.[type] ?? defaultComponents[type] ?? null) as BlockComponent<BlockOfType<TType>> | null;
 }
 
 export function PageBuilderRenderer({

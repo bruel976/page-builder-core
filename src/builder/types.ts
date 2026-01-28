@@ -16,6 +16,11 @@ export interface PageBuilderProps {
   className?: string;
   style?: CSSProperties;
   onImageUpload?: (file: File) => Promise<string>;
+  mode?: "edit" | "view";
+  onSave?: (content: PageContent) => void | Promise<void>;
+  onPublish?: (content: PageContent) => void | Promise<void>;
+  saving?: boolean;
+  publishing?: boolean;
 }
 
 export interface BuilderState {

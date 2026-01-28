@@ -20,7 +20,15 @@ import { PageBuilder, type PageContent } from "@sirel/page-builder";
 const content: PageContent = { blocks: [] };
 
 export function AdminPage() {
-  return <PageBuilder value={content} onChange={(next) => console.log(next)} />;
+  return (
+    <PageBuilder
+      value={content}
+      onChange={(next) => console.log(next)}
+      mode="edit"
+      onSave={(next) => console.log("save", next)}
+      onPublish={(next) => console.log("publish", next)}
+    />
+  );
 }
 ```
 
@@ -44,6 +52,16 @@ const content: PageContent = {
 
 export function Page() {
   return <PageBuilderRenderer content={content} />;
+}
+```
+
+## View mode (read-only)
+
+```tsx
+import { PageBuilder } from "@sirel/page-builder";
+
+export function PreviewPage({ content }: { content: PageContent }) {
+  return <PageBuilder value={content} mode="view" />;
 }
 ```
 

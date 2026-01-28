@@ -1722,9 +1722,18 @@ export function PageBuilder({
   className,
   style,
   onImageUpload,
+  mode = "edit",
+  onSave,
+  onPublish,
+  saving = false,
+  publishing = false,
 }: PageBuilderProps) {
   const { blocks, setBlocks, selectedId, setSelectedId } = useBuilderState(value);
   const [activeTab, setActiveTab] = React.useState<"blocks" | "settings">("blocks");
+
+  if (mode === "view") {
+    return <PageBuilderRenderer content={value ?? { blocks }} filterHidden={true} />;
+  }
 
   const selectedIndex = blocks.findIndex((block) => block.id === selectedId);
   const selectedBlock = selectedIndex >= 0 ? blocks[selectedIndex] : null;
@@ -1776,6 +1785,16 @@ export function PageBuilder({
       block.id === id ? { ...block, visible: block.visible === false ? undefined : false } : block
     );
     emit(next);
+  };
+
+  const handleSave = () => {
+    if (!onSave) return;
+    return onSave({ blocks, metadata: value?.metadata });
+  };
+
+  const handlePublish = () => {
+    if (!onPublish) return;
+    return onPublish({ blocks, metadata: value?.metadata });
   };
 
   return (
@@ -2093,8 +2112,10 @@ export function PageBuilder({
                 color: "#fff",
                 borderColor: "var(--pb-primary)",
               }}
+              onClick={() => void handleSave()}
+              disabled={saving || !onSave}
             >
-              Enregistrer
+              {saving ? "Enregistrement..." : "Enregistrer"}
             </button>
             <button
               type="button"
@@ -2107,8 +2128,10 @@ export function PageBuilder({
                 color: "#fff",
                 borderColor: "var(--pb-primary)",
               }}
+              onClick={() => void handlePublish()}
+              disabled={publishing || !onPublish}
             >
-              Publier
+              {publishing ? "Publication..." : "Publier"}
             </button>
           </div>
         </div>

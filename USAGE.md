@@ -63,6 +63,8 @@ function AdminPage() {
         // Sauvegarder dans votre backend
         console.log("Nouveau contenu:", newContent);
       }}
+      onSave={(next) => console.log("save", next)}
+      onPublish={(next) => console.log("publish", next)}
     />
   );
 }
@@ -221,12 +223,62 @@ function AdminPage() {
       <PageBuilder 
         value={content} 
         onChange={setContent}
+        onSave={handleSave}
+        saving={saving}
       />
       <button onClick={handleSave} disabled={saving}>
         {saving ? "Sauvegarde..." : "Sauvegarder"}
       </button>
     </div>
   );
+}
+```
+
+## 👀 Mode aperçu (lecture seule)
+
+```tsx
+import { PageBuilder, type PageContent } from "@sirel/page-builder";
+
+function PreviewPage({ content }: { content: PageContent }) {
+  return <PageBuilder value={content} mode="view" />;
+}
+```
+
+## 📦 Structure du payload (backend)
+
+Le builder produit un `PageContent`. Pour un backend classique (ex: Laravel), on envoie :
+- `content_type`: `"json"`
+- `content`: **string JSON** avec `{ blocks: [...] }`
+- metadata mappées vers des champs classiques (`title`, `slug`, etc.)
+
+Exemple de payload (création/mise à jour) :
+
+```json
+{
+  "title": "Accueil",
+  "slug": "accueil",
+  "status": "draft",
+  "publication_date": "2026-01-27T10:00:00.000Z",
+  "meta_title": "Titre SEO",
+  "meta_description": "Description SEO",
+  "featured_image": "https://cdn.exemple.com/cover.jpg",
+  "content_type": "json",
+  "content": "{\"blocks\":[{\"id\":\"hero-1\",\"type\":\"hero\",\"title\":\"Bienvenue\"}]}"
+}
+```
+
+Le champ `content` est une **string JSON**. Exemple de contenu décodé :
+
+```json
+{
+  "blocks": [
+    {
+      "id": "hero-1",
+      "type": "hero",
+      "title": "Bienvenue",
+      "subtitle": "Cree et edite ta page directement"
+    }
+  ]
 }
 ```
 
