@@ -23,7 +23,6 @@
     "build": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --clean",
     "dev": "tsup src/index.tsx --format esm,cjs --dts --sourcemap --watch",
     "lint": "echo \"(add lint)\"",
-    "prepare": "npm run build"
 
   },
   "peerDependencies": {
