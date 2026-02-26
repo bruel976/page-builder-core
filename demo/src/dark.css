@@ -1,0 +1,36 @@
+body {
+  background: #0f172a;
+  color: #f1f5f9;
+  font-family: Manrope, system-ui, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+button:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Card backgrounds, etc. */
+.card, .panel, .builder-toolbar {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+/* Demo header */
+.demo-header {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}

@@ -65,6 +65,24 @@ export function PreviewPage({ content }: { content: PageContent }) {
 }
 ```
 
+## Theme (dark mode support)
+
+```tsx
+import { PageBuilder, type BuilderTheme } from "@sirel/page-builder";
+
+const darkTheme: BuilderTheme = {
+  primaryColor: "#2563eb",
+  backgroundColor: "#0f172a",
+  cardColor: "#1e293b",
+  textColor: "#f1f5f9",
+  textMutedColor: "#94a3b8",
+  borderColor: "#334155",
+  inputColor: "#1e293b",
+};
+
+<PageBuilder value={content} onChange={setContent} theme={darkTheme} />;
+```
+
 ## Custom blocks
 
 ```tsx

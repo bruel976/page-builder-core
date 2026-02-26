@@ -45,7 +45,12 @@ export function App() {
     fontFamily: "Manrope, system-ui, sans-serif",
     primaryColor: "#2563eb",
     secondaryColor: "#9333ea",
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#0f172a",
+    cardColor: "#1e293b",
+    textColor: "#f1f5f9",
+    textMutedColor: "#94a3b8",
+    borderColor: "#334155",
+    inputColor: "#1e293b",
   };
 
   const backend = React.useMemo(() => createMockBackend(), []);
@@ -120,28 +125,29 @@ export function App() {
   };
 
   return (
-    <div style={{ display: "grid", gap: "1rem" }}>
+    <div style={{ display: "grid", gap: "1rem", background: "#0f172a", minHeight: "100vh" }}>
       <div
+        className="demo-header"
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0.75rem 1rem",
           borderRadius: 12,
-          border: "1px solid #e2e8f0",
-          background: "#fff",
+          border: "1px solid #334155",
+          background: "#1e293b",
         }}
       >
-        <strong style={{ fontFamily: "inherit", color: "#0f172a" }}>Demo Page Builder</strong>
+        <strong style={{ fontFamily: "inherit", color: "#f1f5f9" }}>Demo Page Builder</strong>
         <div style={{ display: "flex", gap: 8 }}>
           <button
             type="button"
             onClick={() => setMode("view")}
             style={{
               borderRadius: 8,
-              border: "1px solid #e2e8f0",
-              background: mode === "view" ? "#0f172a" : "#fff",
-              color: mode === "view" ? "#fff" : "#0f172a",
+              border: "1px solid #334155",
+              background: mode === "view" ? "#2563eb" : "#1e293b",
+              color: mode === "view" ? "#fff" : "#f1f5f9",
               padding: "0.4rem 0.75rem",
               cursor: "pointer",
             }}
@@ -153,9 +159,9 @@ export function App() {
             onClick={() => setMode("edit")}
             style={{
               borderRadius: 8,
-              border: "1px solid #e2e8f0",
-              background: mode === "edit" ? "#0f172a" : "#fff",
-              color: mode === "edit" ? "#fff" : "#0f172a",
+              border: "1px solid #334155",
+              background: mode === "edit" ? "#2563eb" : "#1e293b",
+              color: mode === "edit" ? "#fff" : "#f1f5f9",
               padding: "0.4rem 0.75rem",
               cursor: "pointer",
             }}
@@ -172,7 +178,7 @@ export function App() {
       )}
 
       {loading ? (
-        <div style={{ padding: "2rem", textAlign: "center", color: "#64748b" }}>Chargement...</div>
+        <div style={{ padding: "2rem", textAlign: "center", color: "#f1f5f9" }}>Chargement...</div>
       ) : (
         <PageBuilder
           value={content}

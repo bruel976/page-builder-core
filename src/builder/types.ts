@@ -6,6 +6,16 @@ export interface BuilderTheme {
   primaryColor?: string;
   secondaryColor?: string;
   backgroundColor?: string;
+  /** Card/panel backgrounds */
+  cardColor?: string;
+  /** Primary text color */
+  textColor?: string;
+  /** Muted/secondary text color */
+  textMutedColor?: string;
+  /** Border color for inputs & cards */
+  borderColor?: string;
+  /** Input background color */
+  inputColor?: string;
 }
 
 export interface PageBuilderProps {

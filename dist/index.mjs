@@ -853,10 +853,18 @@ function useBuilderState(value) {
 function applyTheme(theme) {
   const style = {
     fontFamily: theme?.fontFamily ?? "Manrope, system-ui, sans-serif",
-    backgroundColor: theme?.backgroundColor ?? "#f8fafc"
+    backgroundColor: theme?.backgroundColor ?? "#f8fafc",
+    color: theme?.textColor ?? "#0f172a"
   };
-  style["--pb-primary"] = theme?.primaryColor ?? "#2563eb";
-  style["--pb-secondary"] = theme?.secondaryColor ?? "#9333ea";
+  const vars = style;
+  vars["--pb-primary"] = theme?.primaryColor ?? "#2563eb";
+  vars["--pb-secondary"] = theme?.secondaryColor ?? "#9333ea";
+  vars["--pb-bg"] = theme?.backgroundColor ?? "#f8fafc";
+  vars["--pb-card"] = theme?.cardColor ?? "#ffffff";
+  vars["--pb-text"] = theme?.textColor ?? "#0f172a";
+  vars["--pb-text-muted"] = theme?.textMutedColor ?? "#64748b";
+  vars["--pb-border"] = theme?.borderColor ?? "#e2e8f0";
+  vars["--pb-input"] = theme?.inputColor ?? "#ffffff";
   return style;
 }
 function arrayMove(list, from, to) {
@@ -867,7 +875,7 @@ function arrayMove(list, from, to) {
   return copy;
 }
 function FieldLabel({ children }) {
-  return /* @__PURE__ */ jsx4("label", { style: { fontSize: 13, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }, children });
+  return /* @__PURE__ */ jsx4("label", { style: { fontSize: 13, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }, children });
 }
 function LanguageTabs({
   activeLang,
@@ -887,8 +895,8 @@ function LanguageTabs({
         padding: "0.25rem 0.5rem",
         borderRadius: 6,
         border: "none",
-        background: activeLang === lang.code ? "#f1f5f9" : "transparent",
-        color: activeLang === lang.code ? "#0f172a" : "#64748b",
+        background: activeLang === lang.code ? "var(--pb-card)" : "transparent",
+        color: activeLang === lang.code ? "var(--pb-text)" : "var(--pb-text-muted)",
         cursor: "pointer",
         fontSize: 12,
         fontWeight: activeLang === lang.code ? 600 : 400
@@ -1033,7 +1041,7 @@ function ColorField({
         type: "color",
         value: value ?? "#000000",
         onChange: (event) => onChange(event.target.value),
-        style: { height: 36, width: 64, borderRadius: 8, border: "1px solid #e2e8f0" }
+        style: { height: 36, width: 64, borderRadius: 8, border: "1px solid var(--pb-border)" }
       }
     )
   ] });
@@ -1101,7 +1109,7 @@ function ImageUploadField({
             maxHeight: 200,
             objectFit: "contain",
             borderRadius: 8,
-            border: "1px solid #e2e8f0"
+            border: "1px solid var(--pb-border)"
           }
         }
       ),
@@ -1146,20 +1154,20 @@ function ImageUploadField({
           style: {
             padding: "0.5rem 1rem",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
-            background: uploading ? "#f1f5f9" : "#fff",
+            border: "1px solid var(--pb-border)",
+            background: uploading ? "var(--pb-bg)" : "var(--pb-card)",
             cursor: uploading ? "not-allowed" : "pointer",
             fontSize: 14,
             fontWeight: 500,
             display: "inline-block",
-            color: uploading ? "#94a3b8" : "#0f172a"
+            color: uploading ? "var(--pb-text-muted)" : "var(--pb-text)"
           },
           children: uploading ? "Upload en cours..." : preview ? "Changer l'image" : "Choisir une image"
         }
       )
     ] }),
     /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 6 }, children: [
-      /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "#64748b" }, children: "Ou entrer une URL" }),
+      /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "var(--pb-text-muted)" }, children: "Ou entrer une URL" }),
       /* @__PURE__ */ jsx4(
         "input",
         {
@@ -1210,7 +1218,7 @@ function GradientField({
     /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 8 }, children: [
       /* @__PURE__ */ jsxs3("div", { style: { display: "flex", alignItems: "center", gap: 12 }, children: [
         /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 4 }, children: [
-          /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "#64748b" }, children: "Couleur 1" }),
+          /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "var(--pb-text-muted)" }, children: "Couleur 1" }),
           /* @__PURE__ */ jsxs3("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
             /* @__PURE__ */ jsx4(
               "input",
@@ -1218,7 +1226,7 @@ function GradientField({
                 type: "color",
                 value: gradientState.color1,
                 onChange: (e) => updateGradient({ color1: e.target.value }),
-                style: { height: 40, width: 60, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }
+                style: { height: 40, width: 60, borderRadius: 8, border: "1px solid var(--pb-border)", cursor: "pointer" }
               }
             ),
             /* @__PURE__ */ jsx4(
@@ -1229,14 +1237,14 @@ function GradientField({
                   height: 40,
                   borderRadius: 8,
                   background: gradientState.color1,
-                  border: "1px solid #e2e8f0"
+                  border: "1px solid var(--pb-border)"
                 }
               }
             )
           ] })
         ] }),
         /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 4 }, children: [
-          /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "#64748b" }, children: "Couleur 2" }),
+          /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "var(--pb-text-muted)" }, children: "Couleur 2" }),
           /* @__PURE__ */ jsxs3("div", { style: { display: "flex", alignItems: "center", gap: 8 }, children: [
             /* @__PURE__ */ jsx4(
               "input",
@@ -1244,7 +1252,7 @@ function GradientField({
                 type: "color",
                 value: gradientState.color2,
                 onChange: (e) => updateGradient({ color2: e.target.value }),
-                style: { height: 40, width: 60, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }
+                style: { height: 40, width: 60, borderRadius: 8, border: "1px solid var(--pb-border)", cursor: "pointer" }
               }
             ),
             /* @__PURE__ */ jsx4(
@@ -1255,7 +1263,7 @@ function GradientField({
                   height: 40,
                   borderRadius: 8,
                   background: gradientState.color2,
-                  border: "1px solid #e2e8f0"
+                  border: "1px solid var(--pb-border)"
                 }
               }
             )
@@ -1263,7 +1271,7 @@ function GradientField({
         ] })
       ] }),
       /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 6 }, children: [
-        /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "#64748b" }, children: "Direction" }),
+        /* @__PURE__ */ jsx4("label", { style: { fontSize: 12, color: "var(--pb-text-muted)" }, children: "Direction" }),
         /* @__PURE__ */ jsx4(
           SelectField,
           {
@@ -1291,12 +1299,12 @@ function GradientField({
             height: 60,
             borderRadius: 8,
             background: `linear-gradient(${gradientState.direction}, ${gradientState.color1}, ${gradientState.color2})`,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--pb-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 12,
-            color: "#64748b"
+            color: "var(--pb-text-muted)"
           },
           children: "Aper\xE7u du gradient"
         }
@@ -1307,10 +1315,10 @@ function GradientField({
 var inputStyle = {
   padding: "0.6rem 0.75rem",
   borderRadius: 8,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--pb-border)",
   fontSize: 14,
-  background: "#fff",
-  color: "#0f172a",
+  background: "var(--pb-input)",
+  color: "var(--pb-text)",
   width: "100%",
   maxWidth: "100%",
   boxSizing: "border-box",
@@ -1324,17 +1332,18 @@ var inputStyleFocus = {
   boxShadow: "0 0 0 3px color-mix(in srgb, var(--pb-primary) 10%, transparent)"
 };
 var panelStyle = {
-  background: "#ffffff",
-  border: "1px solid #e2e8f0",
+  background: "var(--pb-card)",
+  border: "1px solid var(--pb-border)",
   borderRadius: 12,
   padding: "1rem",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
 };
 var actionButton = {
   borderRadius: 8,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--pb-border)",
   padding: "0.4rem 0.6rem",
-  background: "#fff",
+  background: "var(--pb-card)",
+  color: "var(--pb-text)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -1350,7 +1359,7 @@ var iconButton = {
   height: 28,
   border: "none",
   background: "transparent",
-  color: "#64748b"
+  color: "var(--pb-text-muted)"
 };
 function blockCard(isActive) {
   return {
@@ -1359,8 +1368,8 @@ function blockCard(isActive) {
     gap: 10,
     padding: "0.75rem",
     borderRadius: 10,
-    border: isActive ? "2px solid var(--pb-primary)" : "1px solid #e2e8f0",
-    background: "#fff",
+    border: isActive ? "2px solid var(--pb-primary)" : "1px solid var(--pb-border)",
+    background: "var(--pb-card)",
     cursor: "pointer",
     position: "relative",
     outline: isActive ? "none" : void 0,
@@ -1369,7 +1378,7 @@ function blockCard(isActive) {
   };
 }
 function SectionTitle({ children }) {
-  return /* @__PURE__ */ jsx4("h3", { style: { margin: 0, fontSize: 14, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }, children });
+  return /* @__PURE__ */ jsx4("h3", { style: { margin: 0, fontSize: 14, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }, children });
 }
 function DragHandle() {
   return /* @__PURE__ */ jsx4("div", { style: { cursor: "grab", display: "flex", gap: 2, padding: "0.25rem" }, children: /* @__PURE__ */ jsxs3("svg", { width: "12", height: "12", viewBox: "0 0 12 12", fill: "none", children: [
@@ -1642,9 +1651,9 @@ function BlockEditor({
                 fontSize: 13,
                 fontWeight: 500,
                 borderStyle: "dashed",
-                borderColor: "#cbd5e1",
-                background: "#f8fafc",
-                color: "#64748b"
+                borderColor: "var(--pb-border)",
+                background: "var(--pb-bg)",
+                color: "var(--pb-text-muted)"
               },
               onClick: () => update({
                 stats: [...hero.stats ?? [], { id: createId("stat"), label: "Label", value: "0" }]
@@ -1664,8 +1673,8 @@ function BlockEditor({
                 gap: 8,
                 padding: "0.75rem",
                 borderRadius: 8,
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc"
+                border: "1px solid var(--pb-border)",
+                background: "var(--pb-bg)"
               },
               children: [
                 /* @__PURE__ */ jsx4(DragHandle, {}),
@@ -1784,9 +1793,9 @@ function BlockEditor({
                 fontSize: 13,
                 fontWeight: 500,
                 borderStyle: "dashed",
-                borderColor: "#cbd5e1",
-                background: "#f8fafc",
-                color: "#64748b"
+                borderColor: "var(--pb-border)",
+                background: "var(--pb-bg)",
+                color: "var(--pb-text-muted)"
               },
               onClick: () => update({
                 slides: [
@@ -1898,8 +1907,8 @@ function BlockEditor({
                 gap: 8,
                 padding: "0.75rem",
                 borderRadius: 8,
-                border: "1px solid #e2e8f0",
-                background: "#f8fafc"
+                border: "1px solid var(--pb-border)",
+                background: "var(--pb-bg)"
               },
               children: [
                 /* @__PURE__ */ jsx4(DragHandle, {}),
@@ -1979,9 +1988,9 @@ function BlockEditor({
                 fontSize: 13,
                 fontWeight: 500,
                 borderStyle: "dashed",
-                borderColor: "#cbd5e1",
-                background: "#f8fafc",
-                color: "#64748b"
+                borderColor: "var(--pb-border)",
+                background: "var(--pb-bg)",
+                color: "var(--pb-text-muted)"
               },
               onClick: () => update({
                 cards: [...stats.cards ?? [], { id: createId("stat"), label: "Service", value: "Description" }]
@@ -2626,13 +2635,13 @@ function PageBuilder({
       style: {
         ...applyTheme(theme),
         ...style,
-        color: "#0f172a",
+        color: "var(--pb-text)",
         display: "grid",
         gridTemplateColumns: "280px 1fr 360px",
         gap: "1.5rem",
         padding: "1.5rem",
         minHeight: "100vh",
-        background: theme?.backgroundColor ?? "#f8fafc"
+        background: theme?.backgroundColor ?? "var(--pb-bg)"
       },
       children: [
         /* @__PURE__ */ jsxs3("aside", { style: { display: "grid", gap: "1rem", alignContent: "start" }, children: [
@@ -2647,8 +2656,8 @@ function PageBuilder({
                   padding: "0.5rem 0.75rem",
                   borderRadius: 8,
                   border: "none",
-                  background: activeTab === "blocks" ? "#fff" : "transparent",
-                  color: activeTab === "blocks" ? "var(--pb-primary)" : "#64748b",
+                  background: activeTab === "blocks" ? "var(--pb-card)" : "transparent",
+                  color: activeTab === "blocks" ? "var(--pb-primary)" : "var(--pb-text-muted)",
                   cursor: "pointer",
                   fontSize: 14,
                   fontWeight: activeTab === "blocks" ? 600 : 400,
@@ -2668,8 +2677,8 @@ function PageBuilder({
                   padding: "0.5rem 0.75rem",
                   borderRadius: 8,
                   border: "none",
-                  background: activeTab === "settings" ? "#fff" : "transparent",
-                  color: activeTab === "settings" ? "var(--pb-primary)" : "#64748b",
+                  background: activeTab === "settings" ? "var(--pb-card)" : "transparent",
+                  color: activeTab === "settings" ? "var(--pb-primary)" : "var(--pb-text-muted)",
                   cursor: "pointer",
                   fontSize: 14,
                   fontWeight: activeTab === "settings" ? 600 : 400,
@@ -2718,7 +2727,7 @@ function PageBuilder({
                 }
               )
             ] }),
-            /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 12, paddingTop: 12, borderTop: "1px solid #e2e8f0" }, children: [
+            /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 12, paddingTop: 12, borderTop: "1px solid var(--pb-border)" }, children: [
               /* @__PURE__ */ jsx4(SectionTitle, { children: "SEO" }),
               /* @__PURE__ */ jsx4(
                 TextField,
@@ -2753,24 +2762,25 @@ function PageBuilder({
                   alignItems: "center",
                   gap: 6,
                   borderRadius: 10,
-                  border: "1px dashed #cbd5e1",
+                  border: "1px dashed var(--pb-border)",
                   padding: "0.75rem 0.5rem",
-                  background: "#f8fafc",
+                  background: "var(--pb-bg)",
+                  color: "var(--pb-text)",
                   cursor: "pointer",
                   fontSize: 12,
                   transition: "all 0.2s"
                 },
                 onClick: () => addBlock(type),
                 onMouseEnter: (e) => {
-                  e.currentTarget.style.background = "#f1f5f9";
-                  e.currentTarget.style.borderColor = "#94a3b8";
+                  e.currentTarget.style.background = "var(--pb-card)";
+                  e.currentTarget.style.borderColor = "var(--pb-text-muted)";
                 },
                 onMouseLeave: (e) => {
-                  e.currentTarget.style.background = "#f8fafc";
-                  e.currentTarget.style.borderColor = "#cbd5e1";
+                  e.currentTarget.style.background = "var(--pb-bg)";
+                  e.currentTarget.style.borderColor = "var(--pb-border)";
                 },
                 children: [
-                  /* @__PURE__ */ jsx4(BlockIcon, { type, size: 20, color: "#64748b" }),
+                  /* @__PURE__ */ jsx4(BlockIcon, { type, size: 20, color: "var(--pb-text-muted)" }),
                   /* @__PURE__ */ jsx4("span", { children: BLOCK_LABELS[type] })
                 ]
               },
@@ -2788,13 +2798,14 @@ function PageBuilder({
                     gap: 8,
                     padding: "0.5rem",
                     borderRadius: 8,
-                    border: "1px dashed #cbd5e1",
-                    background: "#f8fafc",
+                    border: "1px dashed var(--pb-border)",
+                    background: "var(--pb-bg)",
+                    color: "var(--pb-text)",
                     cursor: "pointer",
                     fontSize: 13
                   },
                   children: [
-                    /* @__PURE__ */ jsx4(BlockIcon, { type: "divider", size: 16, color: "#64748b" }),
+                    /* @__PURE__ */ jsx4(BlockIcon, { type: "divider", size: 16, color: "var(--pb-text-muted)" }),
                     /* @__PURE__ */ jsx4("span", { children: "S\xE9parateur" })
                   ]
                 }
@@ -2810,13 +2821,14 @@ function PageBuilder({
                     gap: 8,
                     padding: "0.5rem",
                     borderRadius: 8,
-                    border: "1px dashed #cbd5e1",
-                    background: "#f8fafc",
+                    border: "1px dashed var(--pb-border)",
+                    background: "var(--pb-bg)",
+                    color: "var(--pb-text)",
                     cursor: "pointer",
                     fontSize: 13
                   },
                   children: [
-                    /* @__PURE__ */ jsx4(BlockIcon, { type: "spacer", size: 16, color: "#64748b" }),
+                    /* @__PURE__ */ jsx4(BlockIcon, { type: "spacer", size: 16, color: "var(--pb-text-muted)" }),
                     /* @__PURE__ */ jsx4("span", { children: "Espace" })
                   ]
                 }
@@ -2825,7 +2837,7 @@ function PageBuilder({
           ] }),
           /* @__PURE__ */ jsxs3("div", { style: { ...panelStyle, display: "grid", gap: 8 }, children: [
             /* @__PURE__ */ jsx4(SectionTitle, { children: "Blocs" }),
-            blocks.length === 0 && /* @__PURE__ */ jsx4("p", { style: { margin: 0, fontSize: 13, color: "#64748b", textAlign: "center", padding: "1rem 0" }, children: "Ajoute un bloc pour commencer." }),
+            blocks.length === 0 && /* @__PURE__ */ jsx4("p", { style: { margin: 0, fontSize: 13, color: "var(--pb-text-muted)", textAlign: "center", padding: "1rem 0" }, children: "Ajoute un bloc pour commencer." }),
             blocks.map((block, index) => /* @__PURE__ */ jsxs3(
               "div",
               {
@@ -2845,7 +2857,7 @@ function PageBuilder({
                 },
                 children: [
                   /* @__PURE__ */ jsx4(DragHandle, {}),
-                  /* @__PURE__ */ jsx4(BlockIcon, { type: block.type, size: 18, color: block.id === selectedId ? "var(--pb-primary)" : "#64748b" }),
+                  /* @__PURE__ */ jsx4(BlockIcon, { type: block.type, size: 18, color: block.id === selectedId ? "var(--pb-primary)" : "var(--pb-text-muted)" }),
                   /* @__PURE__ */ jsx4("div", { style: { flex: 1, display: "grid", gap: 2, minWidth: 0 }, children: /* @__PURE__ */ jsx4("strong", { style: { fontSize: 13, fontWeight: 600, fontFamily: "inherit" }, children: BLOCK_LABELS[block.type] }) }),
                   /* @__PURE__ */ jsxs3("div", { style: { display: "flex", gap: 4, alignItems: "center" }, children: [
                     /* @__PURE__ */ jsx4(
@@ -2924,12 +2936,12 @@ function PageBuilder({
                 justifyContent: "space-between",
                 padding: "1rem 1.25rem",
                 borderRadius: 12,
-                border: "1px solid #e2e8f0",
-                background: "#fff",
+                border: "1px solid var(--pb-border)",
+                background: "var(--pb-card)",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
               },
               children: [
-                /* @__PURE__ */ jsx4("div", { children: /* @__PURE__ */ jsx4("strong", { style: { fontSize: 16, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }, children: "Nouvelle page" }) }),
+                /* @__PURE__ */ jsx4("div", { children: /* @__PURE__ */ jsx4("strong", { style: { fontSize: 16, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }, children: "Nouvelle page" }) }),
                 /* @__PURE__ */ jsxs3("div", { style: { display: "flex", gap: 8, alignItems: "center" }, children: [
                   /* @__PURE__ */ jsx4(
                     "button",
@@ -2978,7 +2990,7 @@ function PageBuilder({
                 ...panelStyle,
                 minHeight: 600,
                 overflow: "hidden",
-                background: "#fff",
+                background: "var(--pb-card)",
                 borderRadius: 12
               },
               children: /* @__PURE__ */ jsx4("div", { style: { height: "100%", overflowY: "auto", padding: "1rem" }, children: /* @__PURE__ */ jsx4(PageBuilderRenderer, { content: { blocks }, filterHidden: true }) })
@@ -2989,7 +3001,7 @@ function PageBuilder({
           selectedBlock && /* @__PURE__ */ jsxs3("div", { style: { ...panelStyle, display: "grid", gap: 16 }, children: [
             /* @__PURE__ */ jsxs3("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" }, children: [
               /* @__PURE__ */ jsxs3("div", { style: { display: "flex", alignItems: "center", gap: 10 }, children: [
-                /* @__PURE__ */ jsx4(BlockIcon, { type: selectedBlock.type, size: 20, color: "#0f172a" }),
+                /* @__PURE__ */ jsx4(BlockIcon, { type: selectedBlock.type, size: 20, color: "var(--pb-text)" }),
                 /* @__PURE__ */ jsx4(SectionTitle, { children: BLOCK_LABELS[selectedBlock.type] })
               ] }),
               /* @__PURE__ */ jsxs3("div", { style: { display: "flex", gap: 6 }, children: [
@@ -3018,7 +3030,7 @@ function PageBuilder({
                 )
               ] })
             ] }),
-            /* @__PURE__ */ jsx4("div", { style: { borderTop: "1px solid #e2e8f0", paddingTop: 16 }, children: /* @__PURE__ */ jsx4(
+            /* @__PURE__ */ jsx4("div", { style: { borderTop: "1px solid var(--pb-border)", paddingTop: 16 }, children: /* @__PURE__ */ jsx4(
               BlockEditor,
               {
                 block: selectedBlock,
@@ -3027,7 +3039,7 @@ function PageBuilder({
               }
             ) })
           ] }),
-          !selectedBlock && /* @__PURE__ */ jsx4("div", { style: { ...panelStyle, display: "grid", gap: 12, textAlign: "center", padding: "2rem 1rem" }, children: /* @__PURE__ */ jsx4("p", { style: { margin: 0, fontSize: 14, color: "#64748b" }, children: "S\xE9lectionne un bloc pour modifier ses param\xE8tres." }) })
+          !selectedBlock && /* @__PURE__ */ jsx4("div", { style: { ...panelStyle, display: "grid", gap: 12, textAlign: "center", padding: "2rem 1rem" }, children: /* @__PURE__ */ jsx4("p", { style: { margin: 0, fontSize: 14, color: "var(--pb-text-muted)" }, children: "S\xE9lectionne un bloc pour modifier ses param\xE8tres." }) })
         ] })
       ]
     }

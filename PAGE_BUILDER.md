@@ -149,7 +149,38 @@ Presets disponibles:
 - `testimonialsRating`: `title`, `ratingLabel`, `ratingValue`, `ratingText`, `items`[{id, name, role, quote, photo}]
 - `galleryText`: `title`, `text`, `images`[{id, url, caption}]
 
-## 6) Workflow backoffice (creation / edition)
+## 6) Theme du builder (BuilderTheme)
+
+Le builder supporte un theme personnalisable, incluant le mode sombre.
+
+### Proprietes du theme
+
+| Propriete | Description | Defaut (clair) |
+|-----------|-------------|----------------|
+| `fontFamily` | Police de caracteres | `"Manrope, system-ui, sans-serif"` |
+| `primaryColor` | Couleur principale | `"#2563eb"` |
+| `secondaryColor` | Couleur secondaire | `"#9333ea"` |
+| `backgroundColor` | Fond du builder | `"#f8fafc"` |
+| `cardColor` | Fond des panneaux | `"#ffffff"` |
+| `textColor` | Texte principal | `"#0f172a"` |
+| `textMutedColor` | Texte secondaire | `"#64748b"` |
+| `borderColor` | Bordures | `"#e2e8f0"` |
+| `inputColor` | Fond des inputs | `"#ffffff"` |
+
+### Exemple mode sombre
+
+```tsx
+const darkTheme: BuilderTheme = {
+  backgroundColor: "#0f172a",
+  cardColor: "#1e293b",
+  textColor: "#f1f5f9",
+  textMutedColor: "#94a3b8",
+  borderColor: "#334155",
+  inputColor: "#1e293b",
+};
+```
+
+## 7) Workflow backoffice (creation / edition)
 1. L'utilisateur choisit **Pages dynamiques**.
 2. Creation ou edition d'une page: le builder est force en **content_type = json**.
 3. Ajout de blocs via la palette.
@@ -157,21 +188,21 @@ Presets disponibles:
 5. Reorganisation: montee/descente, duplication, suppression.
 6. Sauvegarde: le contenu est serialise dans `content` sous forme `{ blocks: [...] }`.
 
-## 7) Rendu public
+## 8) Rendu public
 - Route publique: `/pages/:slug`.
 - Si `content_type !== json`, la page est rendue en HTML (`dangerouslySetInnerHTML`).
 - Si `content_type === json`, les blocs sont lus depuis `content` et rendus dans `DynamicPage`.
 
-## 8) Images et media
+## 9) Images et media
 - Les images uploadees depuis le builder passent par `MediaService` (assign_to = `page_content`).
 - Les URLs sont ensuite stockees dans les champs `imageUrl`, `backgroundImage`, etc.
 
-## 9) Points d'attention / limitations connues
+## 10) Points d'attention / limitations connues
 - `visible` est utilise dans l'UI du builder mais **n'est pas filtre** dans le rendu public. Pour masquer un bloc, il faut actuellement le supprimer.
 - Des champs de style (ex: couleurs de bouton dans le hero) existent dans l'UI mais ne sont pas utilises par le rendu public. Si besoin, mettre a jour le renderer.
 - Le JSON est stocke sous forme de string; toute modification manuelle doit rester valide.
 
-## 10) Ajouter un nouveau bloc (guide rapide)
+## 11) Ajouter un nouveau bloc (guide rapide)
 1. **Types/Schema**: ajouter le type et ses champs dans:
    - `sidevam976/src/components/admin/pages/PageBuilder.tsx`
    - `sidevam976/src/components/admin/pages/PageForm.tsx`
@@ -181,7 +212,7 @@ Presets disponibles:
 4. **Rendu public**: ajouter la section dans `DynamicPage`.
 5. **Migration/compat**: prevoir des valeurs par defaut pour les pages existantes.
 
-## 11) Fichiers de reference
+## 12) Fichiers de reference
 - Admin builder: `sidevam976/src/components/admin/pages/PageBuilder.tsx`
 - Form dynamic/system: `sidevam976/src/components/admin/pages/PageForm.tsx`
 - Rendu public: `sidevam976/src/pages/DynamicPage.tsx`

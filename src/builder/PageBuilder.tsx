@@ -83,10 +83,18 @@ function applyTheme(theme?: BuilderTheme): React.CSSProperties {
   const style: React.CSSProperties = {
     fontFamily: theme?.fontFamily ?? "Manrope, system-ui, sans-serif",
     backgroundColor: theme?.backgroundColor ?? "#f8fafc",
+    color: theme?.textColor ?? "#0f172a",
   };
 
-  (style as Record<string, string | number>)['--pb-primary'] = theme?.primaryColor ?? "#2563eb";
-  (style as Record<string, string | number>)['--pb-secondary'] = theme?.secondaryColor ?? "#9333ea";
+  const vars = style as Record<string, string | number>;
+  vars['--pb-primary'] = theme?.primaryColor ?? "#2563eb";
+  vars['--pb-secondary'] = theme?.secondaryColor ?? "#9333ea";
+  vars['--pb-bg'] = theme?.backgroundColor ?? "#f8fafc";
+  vars['--pb-card'] = theme?.cardColor ?? "#ffffff";
+  vars['--pb-text'] = theme?.textColor ?? "#0f172a";
+  vars['--pb-text-muted'] = theme?.textMutedColor ?? "#64748b";
+  vars['--pb-border'] = theme?.borderColor ?? "#e2e8f0";
+  vars['--pb-input'] = theme?.inputColor ?? "#ffffff";
 
   return style;
 }
@@ -100,7 +108,7 @@ function arrayMove<T>(list: T[], from: number, to: number) {
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }}>{children}</label>;
+  return <label style={{ fontSize: 13, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }}>{children}</label>;
 }
 
 function LanguageTabs({
@@ -127,8 +135,8 @@ function LanguageTabs({
             padding: "0.25rem 0.5rem",
             borderRadius: 6,
             border: "none",
-            background: activeLang === lang.code ? "#f1f5f9" : "transparent",
-            color: activeLang === lang.code ? "#0f172a" : "#64748b",
+            background: activeLang === lang.code ? "var(--pb-card)" : "transparent",
+            color: activeLang === lang.code ? "var(--pb-text)" : "var(--pb-text-muted)",
             cursor: "pointer",
             fontSize: 12,
             fontWeight: activeLang === lang.code ? 600 : 400,
@@ -316,7 +324,7 @@ function ColorField({
         type="color"
         value={value ?? "#000000"}
         onChange={(event) => onChange(event.target.value)}
-        style={{ height: 36, width: 64, borderRadius: 8, border: "1px solid #e2e8f0" }}
+        style={{ height: 36, width: 64, borderRadius: 8, border: "1px solid var(--pb-border)" }}
       />
     </div>
   );
@@ -399,7 +407,7 @@ function ImageUploadField({
               maxHeight: 200,
               objectFit: "contain",
               borderRadius: 8,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--pb-border)",
             }}
           />
           <button
@@ -438,13 +446,13 @@ function ImageUploadField({
           style={{
             padding: "0.5rem 1rem",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
-            background: uploading ? "#f1f5f9" : "#fff",
+            border: "1px solid var(--pb-border)",
+            background: uploading ? "var(--pb-bg)" : "var(--pb-card)",
             cursor: uploading ? "not-allowed" : "pointer",
             fontSize: 14,
             fontWeight: 500,
             display: "inline-block",
-            color: uploading ? "#94a3b8" : "#0f172a",
+            color: uploading ? "var(--pb-text-muted)" : "var(--pb-text)",
           }}
         >
           {uploading ? "Upload en cours..." : preview ? "Changer l'image" : "Choisir une image"}
@@ -452,7 +460,7 @@ function ImageUploadField({
       </div>
 
       <div style={{ display: "grid", gap: 6 }}>
-        <label style={{ fontSize: 12, color: "#64748b" }}>Ou entrer une URL</label>
+        <label style={{ fontSize: 12, color: "var(--pb-text-muted)" }}>Ou entrer une URL</label>
         <input
           type="text"
           value={value ?? ""}
@@ -515,13 +523,13 @@ function GradientField({
       <div style={{ display: "grid", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ display: "grid", gap: 4 }}>
-            <label style={{ fontSize: 12, color: "#64748b" }}>Couleur 1</label>
+            <label style={{ fontSize: 12, color: "var(--pb-text-muted)" }}>Couleur 1</label>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="color"
                 value={gradientState.color1}
                 onChange={(e) => updateGradient({ color1: e.target.value })}
-                style={{ height: 40, width: 60, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }}
+                style={{ height: 40, width: 60, borderRadius: 8, border: "1px solid var(--pb-border)", cursor: "pointer" }}
               />
               <div
                 style={{
@@ -529,19 +537,19 @@ function GradientField({
                   height: 40,
                   borderRadius: 8,
                   background: gradientState.color1,
-                  border: "1px solid #e2e8f0",
+                  border: "1px solid var(--pb-border)",
                 }}
               />
             </div>
           </div>
           <div style={{ display: "grid", gap: 4 }}>
-            <label style={{ fontSize: 12, color: "#64748b" }}>Couleur 2</label>
+            <label style={{ fontSize: 12, color: "var(--pb-text-muted)" }}>Couleur 2</label>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="color"
                 value={gradientState.color2}
                 onChange={(e) => updateGradient({ color2: e.target.value })}
-                style={{ height: 40, width: 60, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer" }}
+                style={{ height: 40, width: 60, borderRadius: 8, border: "1px solid var(--pb-border)", cursor: "pointer" }}
               />
               <div
                 style={{
@@ -549,14 +557,14 @@ function GradientField({
                   height: 40,
                   borderRadius: 8,
                   background: gradientState.color2,
-                  border: "1px solid #e2e8f0",
+                  border: "1px solid var(--pb-border)",
                 }}
               />
             </div>
           </div>
         </div>
         <div style={{ display: "grid", gap: 6 }}>
-          <label style={{ fontSize: 12, color: "#64748b" }}>Direction</label>
+          <label style={{ fontSize: 12, color: "var(--pb-text-muted)" }}>Direction</label>
           <SelectField
             label=""
             value={gradientState.direction}
@@ -579,12 +587,12 @@ function GradientField({
             height: 60,
             borderRadius: 8,
             background: `linear-gradient(${gradientState.direction}, ${gradientState.color1}, ${gradientState.color2})`,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--pb-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 12,
-            color: "#64748b",
+            color: "var(--pb-text-muted)",
           }}
         >
           Aperçu du gradient
@@ -597,10 +605,10 @@ function GradientField({
 const inputStyle: React.CSSProperties = {
   padding: "0.6rem 0.75rem",
   borderRadius: 8,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--pb-border)",
   fontSize: 14,
-  background: "#fff",
-  color: "#0f172a",
+  background: "var(--pb-input)",
+  color: "var(--pb-text)",
   width: "100%",
   maxWidth: "100%",
   boxSizing: "border-box",
@@ -616,8 +624,8 @@ const inputStyleFocus: React.CSSProperties = {
 };
 
 const panelStyle: React.CSSProperties = {
-  background: "#ffffff",
-  border: "1px solid #e2e8f0",
+  background: "var(--pb-card)",
+  border: "1px solid var(--pb-border)",
   borderRadius: 12,
   padding: "1rem",
   boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)",
@@ -625,9 +633,10 @@ const panelStyle: React.CSSProperties = {
 
 const actionButton: React.CSSProperties = {
   borderRadius: 8,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--pb-border)",
   padding: "0.4rem 0.6rem",
-  background: "#fff",
+  background: "var(--pb-card)",
+  color: "var(--pb-text)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -644,7 +653,7 @@ const iconButton: React.CSSProperties = {
   height: 28,
   border: "none",
   background: "transparent",
-  color: "#64748b",
+  color: "var(--pb-text-muted)",
 };
 
 function blockCard(isActive: boolean): React.CSSProperties {
@@ -654,8 +663,8 @@ function blockCard(isActive: boolean): React.CSSProperties {
     gap: 10,
     padding: "0.75rem",
     borderRadius: 10,
-    border: isActive ? "2px solid var(--pb-primary)" : "1px solid #e2e8f0",
-    background: "#fff",
+    border: isActive ? "2px solid var(--pb-primary)" : "1px solid var(--pb-border)",
+    background: "var(--pb-card)",
     cursor: "pointer",
     position: "relative",
     outline: isActive ? "none" : undefined,
@@ -665,7 +674,7 @@ function blockCard(isActive: boolean): React.CSSProperties {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }}>{children}</h3>;
+  return <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }}>{children}</h3>;
 }
 
 function DragHandle() {
@@ -915,9 +924,9 @@ function BlockEditor({
                   fontSize: 13,
                   fontWeight: 500,
                   borderStyle: "dashed",
-                  borderColor: "#cbd5e1",
-                  background: "#f8fafc",
-                  color: "#64748b",
+                  borderColor: "var(--pb-border)",
+                  background: "var(--pb-bg)",
+                  color: "var(--pb-text-muted)",
                 }}
                 onClick={() =>
                   update({
@@ -943,8 +952,8 @@ function BlockEditor({
                         gap: 8,
                         padding: "0.75rem",
                         borderRadius: 8,
-                        border: "1px solid #e2e8f0",
-                        background: "#f8fafc",
+                        border: "1px solid var(--pb-border)",
+                        background: "var(--pb-bg)",
                       }}
                     >
                       <DragHandle />
@@ -1046,9 +1055,9 @@ function BlockEditor({
                   fontSize: 13,
                   fontWeight: 500,
                   borderStyle: "dashed",
-                  borderColor: "#cbd5e1",
-                  background: "#f8fafc",
-                  color: "#64748b",
+                  borderColor: "var(--pb-border)",
+                  background: "var(--pb-bg)",
+                  color: "var(--pb-text-muted)",
                 }}
                 onClick={() =>
                   update({
@@ -1149,8 +1158,8 @@ function BlockEditor({
                       gap: 8,
                       padding: "0.75rem",
                       borderRadius: 8,
-                      border: "1px solid #e2e8f0",
-                      background: "#f8fafc",
+                      border: "1px solid var(--pb-border)",
+                      background: "var(--pb-bg)",
                     }}
                   >
                     <DragHandle />
@@ -1222,9 +1231,9 @@ function BlockEditor({
                 fontSize: 13,
                 fontWeight: 500,
                 borderStyle: "dashed",
-                borderColor: "#cbd5e1",
-                background: "#f8fafc",
-                color: "#64748b",
+                borderColor: "var(--pb-border)",
+                background: "var(--pb-bg)",
+                color: "var(--pb-text-muted)",
               }}
               onClick={() =>
                 update({
@@ -1803,13 +1812,13 @@ export function PageBuilder({
       style={{
         ...applyTheme(theme),
         ...style,
-        color: "#0f172a",
+        color: "var(--pb-text)",
         display: "grid",
         gridTemplateColumns: "280px 1fr 360px",
         gap: "1.5rem",
         padding: "1.5rem",
         minHeight: "100vh",
-        background: theme?.backgroundColor ?? "#f8fafc",
+        background: theme?.backgroundColor ?? "var(--pb-bg)",
       }}
     >
       <aside style={{ display: "grid", gap: "1rem", alignContent: "start" }}>
@@ -1822,8 +1831,8 @@ export function PageBuilder({
               padding: "0.5rem 0.75rem",
               borderRadius: 8,
               border: "none",
-              background: activeTab === "blocks" ? "#fff" : "transparent",
-              color: activeTab === "blocks" ? "var(--pb-primary)" : "#64748b",
+              background: activeTab === "blocks" ? "var(--pb-card)" : "transparent",
+              color: activeTab === "blocks" ? "var(--pb-primary)" : "var(--pb-text-muted)",
               cursor: "pointer",
               fontSize: 14,
               fontWeight: activeTab === "blocks" ? 600 : 400,
@@ -1841,8 +1850,8 @@ export function PageBuilder({
               padding: "0.5rem 0.75rem",
               borderRadius: 8,
               border: "none",
-              background: activeTab === "settings" ? "#fff" : "transparent",
-              color: activeTab === "settings" ? "var(--pb-primary)" : "#64748b",
+              background: activeTab === "settings" ? "var(--pb-card)" : "transparent",
+              color: activeTab === "settings" ? "var(--pb-primary)" : "var(--pb-text-muted)",
               cursor: "pointer",
               fontSize: 14,
               fontWeight: activeTab === "settings" ? 600 : 400,
@@ -1888,7 +1897,7 @@ export function PageBuilder({
                 style={inputStyle}
               />
             </div>
-            <div style={{ display: "grid", gap: 12, paddingTop: 12, borderTop: "1px solid #e2e8f0" }}>
+            <div style={{ display: "grid", gap: 12, paddingTop: 12, borderTop: "1px solid var(--pb-border)" }}>
               <SectionTitle>SEO</SectionTitle>
               <TextField
                 label="Meta titre"
@@ -1921,24 +1930,25 @@ export function PageBuilder({
                     alignItems: "center",
                     gap: 6,
                     borderRadius: 10,
-                    border: "1px dashed #cbd5e1",
+                    border: "1px dashed var(--pb-border)",
                     padding: "0.75rem 0.5rem",
-                    background: "#f8fafc",
+                    background: "var(--pb-bg)",
+                    color: "var(--pb-text)",
                     cursor: "pointer",
                     fontSize: 12,
                     transition: "all 0.2s",
                   }}
                   onClick={() => addBlock(type)}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f1f5f9";
-                    e.currentTarget.style.borderColor = "#94a3b8";
+                    e.currentTarget.style.background = "var(--pb-card)";
+                    e.currentTarget.style.borderColor = "var(--pb-text-muted)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#f8fafc";
-                    e.currentTarget.style.borderColor = "#cbd5e1";
+                    e.currentTarget.style.background = "var(--pb-bg)";
+                    e.currentTarget.style.borderColor = "var(--pb-border)";
                   }}
                 >
-                  <BlockIcon type={type} size={20} color="#64748b" />
+                  <BlockIcon type={type} size={20} color="var(--pb-text-muted)" />
                   <span>{BLOCK_LABELS[type]}</span>
                 </button>
               ))}
@@ -1955,13 +1965,14 @@ export function PageBuilder({
                       gap: 8,
                       padding: "0.5rem",
                       borderRadius: 8,
-                      border: "1px dashed #cbd5e1",
-                      background: "#f8fafc",
+                      border: "1px dashed var(--pb-border)",
+                      background: "var(--pb-bg)",
+                      color: "var(--pb-text)",
                       cursor: "pointer",
                       fontSize: 13,
                     }}
                   >
-                    <BlockIcon type="divider" size={16} color="#64748b" />
+                    <BlockIcon type="divider" size={16} color="var(--pb-text-muted)" />
                     <span>Séparateur</span>
                   </button>
                 )}
@@ -1975,13 +1986,14 @@ export function PageBuilder({
                       gap: 8,
                       padding: "0.5rem",
                       borderRadius: 8,
-                      border: "1px dashed #cbd5e1",
-                      background: "#f8fafc",
+                      border: "1px dashed var(--pb-border)",
+                      background: "var(--pb-bg)",
+                      color: "var(--pb-text)",
                       cursor: "pointer",
                       fontSize: 13,
                     }}
                   >
-                    <BlockIcon type="spacer" size={16} color="#64748b" />
+                    <BlockIcon type="spacer" size={16} color="var(--pb-text-muted)" />
                     <span>Espace</span>
                   </button>
                 )}
@@ -1993,7 +2005,7 @@ export function PageBuilder({
         <div style={{ ...panelStyle, display: "grid", gap: 8 }}>
           <SectionTitle>Blocs</SectionTitle>
           {blocks.length === 0 && (
-            <p style={{ margin: 0, fontSize: 13, color: "#64748b", textAlign: "center", padding: "1rem 0" }}>
+            <p style={{ margin: 0, fontSize: 13, color: "var(--pb-text-muted)", textAlign: "center", padding: "1rem 0" }}>
               Ajoute un bloc pour commencer.
             </p>
           )}
@@ -2016,7 +2028,7 @@ export function PageBuilder({
               }}
             >
               <DragHandle />
-              <BlockIcon type={block.type} size={18} color={block.id === selectedId ? "var(--pb-primary)" : "#64748b"} />
+              <BlockIcon type={block.type} size={18} color={block.id === selectedId ? "var(--pb-primary)" : "var(--pb-text-muted)"} />
               <div style={{ flex: 1, display: "grid", gap: 2, minWidth: 0 }}>
                 <strong style={{ fontSize: 13, fontWeight: 600, fontFamily: "inherit" }}>{BLOCK_LABELS[block.type]}</strong>
               </div>
@@ -2092,13 +2104,13 @@ export function PageBuilder({
             justifyContent: "space-between",
             padding: "1rem 1.25rem",
             borderRadius: 12,
-            border: "1px solid #e2e8f0",
-            background: "#fff",
+            border: "1px solid var(--pb-border)",
+            background: "var(--pb-card)",
             boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
           }}
         >
           <div>
-            <strong style={{ fontSize: 16, fontWeight: 600, color: "#0f172a", fontFamily: "inherit" }}>Nouvelle page</strong>
+            <strong style={{ fontSize: 16, fontWeight: 600, color: "var(--pb-text)", fontFamily: "inherit" }}>Nouvelle page</strong>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <button
@@ -2141,7 +2153,7 @@ export function PageBuilder({
             ...panelStyle,
             minHeight: 600,
             overflow: "hidden",
-            background: "#fff",
+            background: "var(--pb-card)",
             borderRadius: 12,
           }}
         >
@@ -2156,7 +2168,7 @@ export function PageBuilder({
           <div style={{ ...panelStyle, display: "grid", gap: 16 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <BlockIcon type={selectedBlock.type} size={20} color="#0f172a" />
+                <BlockIcon type={selectedBlock.type} size={20} color="var(--pb-text)" />
                 <SectionTitle>{BLOCK_LABELS[selectedBlock.type]}</SectionTitle>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
@@ -2183,7 +2195,7 @@ export function PageBuilder({
                 </button>
               </div>
             </div>
-            <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 16 }}>
+            <div style={{ borderTop: "1px solid var(--pb-border)", paddingTop: 16 }}>
               <BlockEditor
                 block={selectedBlock}
                 onChange={(updated) => updateBlock(updated)}
@@ -2194,7 +2206,7 @@ export function PageBuilder({
         )}
         {!selectedBlock && (
           <div style={{ ...panelStyle, display: "grid", gap: 12, textAlign: "center", padding: "2rem 1rem" }}>
-            <p style={{ margin: 0, fontSize: 14, color: "#64748b" }}>Sélectionne un bloc pour modifier ses paramètres.</p>
+            <p style={{ margin: 0, fontSize: 14, color: "var(--pb-text-muted)" }}>Sélectionne un bloc pour modifier ses paramètres.</p>
           </div>
         )}
       </aside>

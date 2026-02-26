@@ -105,14 +105,37 @@ function PublicPage() {
 
 ## 🎨 Personnalisation du thème
 
+Le `BuilderTheme` permet de personnaliser l'apparence complète du builder, y compris le support du mode sombre.
+
+### Propriétés disponibles
+
+| Propriété | Description | Valeur par défaut |
+|-----------|-------------|-------------------|
+| `fontFamily` | Police de caractères | `"Manrope, system-ui, sans-serif"` |
+| `primaryColor` | Couleur principale (boutons, accents) | `"#2563eb"` |
+| `secondaryColor` | Couleur secondaire | `"#9333ea"` |
+| `backgroundColor` | Fond général du builder | `"#f8fafc"` |
+| `cardColor` | Fond des panneaux et cartes | `"#ffffff"` |
+| `textColor` | Couleur du texte principal | `"#0f172a"` |
+| `textMutedColor` | Couleur du texte secondaire | `"#64748b"` |
+| `borderColor` | Couleur des bordures | `"#e2e8f0"` |
+| `inputColor` | Fond des champs de saisie | `"#ffffff"` |
+
+### Exemple : Thème clair (par défaut)
+
 ```tsx
 import { PageBuilder, type BuilderTheme } from "@sirel/page-builder";
 
-const customTheme: BuilderTheme = {
+const lightTheme: BuilderTheme = {
   fontFamily: "Inter, system-ui, sans-serif",
   primaryColor: "#2563eb",
   secondaryColor: "#9333ea",
   backgroundColor: "#f8fafc",
+  cardColor: "#ffffff",
+  textColor: "#0f172a",
+  textMutedColor: "#64748b",
+  borderColor: "#e2e8f0",
+  inputColor: "#ffffff",
 };
 
 function AdminPage() {
@@ -120,7 +143,35 @@ function AdminPage() {
     <PageBuilder 
       value={content} 
       onChange={setContent}
-      theme={customTheme}
+      theme={lightTheme}
+    />
+  );
+}
+```
+
+### Exemple : Mode sombre
+
+```tsx
+import { PageBuilder, type BuilderTheme } from "@sirel/page-builder";
+
+const darkTheme: BuilderTheme = {
+  fontFamily: "Manrope, system-ui, sans-serif",
+  primaryColor: "#2563eb",
+  secondaryColor: "#9333ea",
+  backgroundColor: "#0f172a",
+  cardColor: "#1e293b",
+  textColor: "#f1f5f9",
+  textMutedColor: "#94a3b8",
+  borderColor: "#334155",
+  inputColor: "#1e293b",
+};
+
+function AdminPage() {
+  return (
+    <PageBuilder 
+      value={content} 
+      onChange={setContent}
+      theme={darkTheme}
     />
   );
 }
