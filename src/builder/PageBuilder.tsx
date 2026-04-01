@@ -7,6 +7,7 @@ import type {
   FaqBlock,
   GalleryBlock,
   HeroBlock,
+  HeroSlide,
   IconListBlock,
   ImageBlock,
   PageContent,
@@ -776,6 +777,13 @@ function BlockEditor({
       const removeSlide = (id: string) => {
         update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
       };
+      const updateSlide = (slideId: string, props: Partial<HeroSlide>) => {
+        update({
+          slides: (hero.slides ?? []).map((s) =>
+            s.id === slideId ? { ...s, ...props } : s
+          ),
+        });
+      };
       return (
         <div style={{ display: "grid", gap: 16 }}>
           <SelectField
@@ -961,51 +969,31 @@ function BlockEditor({
                         <TextField
                           label=""
                           value={slide.title ?? ""}
-                          onChange={(value) => {
-                            const next = [...(hero.slides ?? [])];
-                            next[index] = { ...slide, title: value };
-                            update({ slides: next });
-                          }}
+                          onChange={(value) => updateSlide(slide.id, { title: value })}
                           placeholder="Titre"
                         />
                         <TextField
                           label=""
                           value={slide.subtitle ?? ""}
-                          onChange={(value) => {
-                            const next = [...(hero.slides ?? [])];
-                            next[index] = { ...slide, subtitle: value };
-                            update({ slides: next });
-                          }}
+                          onChange={(value) => updateSlide(slide.id, { subtitle: value })}
                           placeholder="Sous-titre"
                         />
                         <ImageUploadField
                           label=""
                           value={slide.imageUrl ?? ""}
-                          onChange={(value) => {
-                            const next = [...(hero.slides ?? [])];
-                            next[index] = { ...slide, imageUrl: value };
-                            update({ slides: next });
-                          }}
+                          onChange={(value) => updateSlide(slide.id, { imageUrl: value })}
                           onUpload={onImageUpload}
                         />
                         <TextField
                           label=""
                           value={slide.ctaText ?? ""}
-                          onChange={(value) => {
-                            const next = [...(hero.slides ?? [])];
-                            next[index] = { ...slide, ctaText: value };
-                            update({ slides: next });
-                          }}
+                          onChange={(value) => updateSlide(slide.id, { ctaText: value })}
                           placeholder="Texte CTA"
                         />
                         <TextField
                           label=""
                           value={slide.ctaLink ?? ""}
-                          onChange={(value) => {
-                            const next = [...(hero.slides ?? [])];
-                            next[index] = { ...slide, ctaLink: value };
-                            update({ slides: next });
-                          }}
+                          onChange={(value) => updateSlide(slide.id, { ctaLink: value })}
                           placeholder="Lien CTA"
                         />
                       </div>

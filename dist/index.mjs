@@ -1770,6 +1770,13 @@ function BlockEditor({
       const removeSlide = (id) => {
         update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
       };
+      const updateSlide = (slideId, props) => {
+        update({
+          slides: (hero.slides ?? []).map(
+            (s) => s.id === slideId ? { ...s, ...props } : s
+          )
+        });
+      };
       return /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 16 }, children: [
         /* @__PURE__ */ jsx4(
           SelectField,
@@ -1984,11 +1991,7 @@ function BlockEditor({
                     {
                       label: "",
                       value: slide.title ?? "",
-                      onChange: (value) => {
-                        const next = [...hero.slides ?? []];
-                        next[index] = { ...slide, title: value };
-                        update({ slides: next });
-                      },
+                      onChange: (value) => updateSlide(slide.id, { title: value }),
                       placeholder: "Titre"
                     }
                   ),
@@ -1997,11 +2000,7 @@ function BlockEditor({
                     {
                       label: "",
                       value: slide.subtitle ?? "",
-                      onChange: (value) => {
-                        const next = [...hero.slides ?? []];
-                        next[index] = { ...slide, subtitle: value };
-                        update({ slides: next });
-                      },
+                      onChange: (value) => updateSlide(slide.id, { subtitle: value }),
                       placeholder: "Sous-titre"
                     }
                   ),
@@ -2010,11 +2009,7 @@ function BlockEditor({
                     {
                       label: "",
                       value: slide.imageUrl ?? "",
-                      onChange: (value) => {
-                        const next = [...hero.slides ?? []];
-                        next[index] = { ...slide, imageUrl: value };
-                        update({ slides: next });
-                      },
+                      onChange: (value) => updateSlide(slide.id, { imageUrl: value }),
                       onUpload: onImageUpload
                     }
                   ),
@@ -2023,11 +2018,7 @@ function BlockEditor({
                     {
                       label: "",
                       value: slide.ctaText ?? "",
-                      onChange: (value) => {
-                        const next = [...hero.slides ?? []];
-                        next[index] = { ...slide, ctaText: value };
-                        update({ slides: next });
-                      },
+                      onChange: (value) => updateSlide(slide.id, { ctaText: value }),
                       placeholder: "Texte CTA"
                     }
                   ),
@@ -2036,11 +2027,7 @@ function BlockEditor({
                     {
                       label: "",
                       value: slide.ctaLink ?? "",
-                      onChange: (value) => {
-                        const next = [...hero.slides ?? []];
-                        next[index] = { ...slide, ctaLink: value };
-                        update({ slides: next });
-                      },
+                      onChange: (value) => updateSlide(slide.id, { ctaLink: value }),
                       placeholder: "Lien CTA"
                     }
                   )
