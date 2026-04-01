@@ -345,6 +345,12 @@ function ImageUploadField({
   const [preview, setPreview] = React.useState<string | null>(value ?? null);
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  
+  // Garde toujours la dernière version de onChange pour éviter les closures stale
+  const onChangeRef = React.useRef(onChange);
+  React.useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   React.useEffect(() => {
     if (value) {
@@ -366,7 +372,7 @@ function ImageUploadField({
       setUploading(true);
       try {
         const url = await onUpload(file);
-        onChange(url);
+        onChangeRef.current(url);
         setPreview(url);
       } catch (error) {
         alert("Erreur lors de l'upload de l'image");
@@ -379,7 +385,7 @@ function ImageUploadField({
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        onChange(base64);
+        onChangeRef.current(base64);
         setPreview(base64);
       };
       reader.readAsDataURL(file);
@@ -719,10 +725,13 @@ function BlockEditor({
   onImageUpload,
 }: {
   block: Block;
-  onChange: (updated: Block) => void;
+  onChange: (updated: Block | ((prev: Block) => Block)) => void;
   onImageUpload?: (file: File) => Promise<string>;
 }) {
   const update = (patch: Partial<Block>) => onChange({ ...block, ...patch } as Block);
+  const updateFn = (fn: (prev: Block) => Partial<Block>) => {
+    onChange((prev) => ({ ...prev, ...fn(prev) } as Block));
+  };
 
   const renderCommon = () => (
     <div style={{ display: "grid", gap: 12 }}>
@@ -778,11 +787,12 @@ function BlockEditor({
         update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
       };
       const updateSlide = (slideId: string, props: Partial<HeroSlide>) => {
-        update({
-          slides: (hero.slides ?? []).map((s) =>
+        // Utilise updateFn pour toujours travailler avec le dernier état
+        updateFn((prev) => ({
+          slides: ((prev as HeroBlock).slides ?? []).map((s) =>
             s.id === slideId ? { ...s, ...props } : s
           ),
-        });
+        }));
       };
       return (
         <div style={{ display: "grid", gap: 16 }}>
@@ -1772,9 +1782,19 @@ export function PageBuilder({
     emit(arrayMove(blocks, from, to));
   };
 
-  const updateBlock = (updated: Block) => {
-    const next = blocks.map((block) => (block.id === updated.id ? updated : block));
-    emit(next);
+  const updateBlock = (updated: Block | ((prev: Block) => Block)) => {
+    if (typeof updated === "function") {
+      const next = blocks.map((block) => {
+        if (block.id === selectedId) {
+          return updated(block);
+        }
+        return block;
+      });
+      emit(next);
+    } else {
+      const next = blocks.map((block) => (block.id === updated.id ? updated : block));
+      emit(next);
+    }
   };
 
   const toggleBlockVisibility = (id: string) => {

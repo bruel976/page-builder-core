@@ -1407,6 +1407,10 @@ function ImageUploadField({
   const [preview, setPreview] = React3.useState(value ?? null);
   const [uploading, setUploading] = React3.useState(false);
   const fileInputRef = React3.useRef(null);
+  const onChangeRef = React3.useRef(onChange);
+  React3.useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
   React3.useEffect(() => {
     if (value) {
       setPreview(value);
@@ -1423,7 +1427,7 @@ function ImageUploadField({
       setUploading(true);
       try {
         const url = await onUpload(file);
-        onChange(url);
+        onChangeRef.current(url);
         setPreview(url);
       } catch (error) {
         alert("Erreur lors de l'upload de l'image");
@@ -1435,7 +1439,7 @@ function ImageUploadField({
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result;
-        onChange(base64);
+        onChangeRef.current(base64);
         setPreview(base64);
       };
       reader.readAsDataURL(file);
@@ -1763,6 +1767,9 @@ function BlockEditor({
   onImageUpload
 }) {
   const update = (patch) => onChange({ ...block, ...patch });
+  const updateFn = (fn) => {
+    onChange((prev) => ({ ...prev, ...fn(prev) }));
+  };
   const renderCommon = () => /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gap: 12 }, children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       SelectField,
@@ -1823,11 +1830,11 @@ function BlockEditor({
         update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
       };
       const updateSlide = (slideId, props) => {
-        update({
-          slides: (hero.slides ?? []).map(
+        updateFn((prev) => ({
+          slides: (prev.slides ?? []).map(
             (s) => s.id === slideId ? { ...s, ...props } : s
           )
-        });
+        }));
       };
       return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gap: 16 }, children: [
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -2950,8 +2957,18 @@ function PageBuilder({
     emit(arrayMove(blocks, from, to));
   };
   const updateBlock = (updated) => {
-    const next = blocks.map((block) => block.id === updated.id ? updated : block);
-    emit(next);
+    if (typeof updated === "function") {
+      const next = blocks.map((block) => {
+        if (block.id === selectedId) {
+          return updated(block);
+        }
+        return block;
+      });
+      emit(next);
+    } else {
+      const next = blocks.map((block) => block.id === updated.id ? updated : block);
+      emit(next);
+    }
   };
   const toggleBlockVisibility = (id) => {
     const next = blocks.map(
