@@ -51,6 +51,9 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderer.tsx
+var React2 = __toESM(require("react"));
+
+// src/blocks/defaultBlocks.tsx
 var React = __toESM(require("react"));
 
 // src/utils/style.ts
@@ -134,90 +137,387 @@ function BlockSection({
 }) {
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", { style: { ...sectionBaseStyle, ...getBlockStyle(block), ...style }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: contentMaxWidth, children }) });
 }
+var carouselNavButton = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: 48,
+  height: 48,
+  borderRadius: "50%",
+  border: "none",
+  background: "rgba(255, 255, 255, 0.9)",
+  color: "#1e293b",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  zIndex: 10,
+  transition: "background 0.2s, transform 0.2s"
+};
+var carouselDot = {
+  width: 10,
+  height: 10,
+  borderRadius: "50%",
+  border: "none",
+  cursor: "pointer",
+  transition: "background 0.2s, transform 0.2s"
+};
 function HeroBlockView({ block }) {
-  const layout = block.variant === "split" ? {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: "2rem",
-    alignItems: "center"
-  } : {
-    display: "grid",
-    gap: "1.75rem"
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const slides = block.slides ?? [];
+  const slidesCount = slides.length;
+  React.useEffect(() => {
+    if (block.variant !== "carousel" || slidesCount <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slidesCount);
+    }, 5e3);
+    return () => clearInterval(interval);
+  }, [block.variant, slidesCount]);
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + slidesCount) % slidesCount);
+  };
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % slidesCount);
+  };
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowLeft") goToPrev();
+    if (e.key === "ArrowRight") goToNext();
   };
   const textAlign = block.textAlignment ?? "start";
   const contentAlign = block.contentAlign ?? "start";
   const textMaxWidth = 680;
   const titleSize = block.titleSize ?? 42;
   const subtitleSize = block.subtitleSize ?? 18;
+  const minHeight = block.minHeight ?? 55;
   const contentPlacement = contentAlign === "center" ? { marginLeft: "auto", marginRight: "auto", justifySelf: "center" } : contentAlign === "end" ? { marginLeft: "auto", justifySelf: "end" } : { justifySelf: "start" };
   const textAlignStyle = {
     textAlign
   };
-  const showImageFirst = block.variant === "split" && block.imagePosition === "left";
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(BlockSection, { block, style: getHeroSectionStyle(block.minHeight), children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: layout, children: [
-      showImageFirst && block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: block.imageUrl, alt: block.title ?? "", style: imageStyle }) }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-        "div",
-        {
-          style: {
-            ...textAlignStyle,
-            display: "grid",
-            gap: "1rem",
-            width: "100%",
-            maxWidth: textMaxWidth,
-            ...contentPlacement
-          },
-          children: [
-            block.title && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { style: { margin: 0, fontSize: titleSize, lineHeight: 1.1, fontWeight: 700 }, children: block.title }),
-            block.subtitle && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: 0, fontSize: subtitleSize, lineHeight: 1.7, opacity: 0.85 }, children: block.subtitle }),
-            block.ctaText && block.ctaLink && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "0.75rem" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", { href: block.ctaLink, style: buttonStyle, children: block.ctaText }) }),
-            block.variant === "stats" && block.stats && block.stats.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-              "ul",
-              {
-                style: {
-                  listStyle: "none",
-                  margin: "0.5rem 0 0",
-                  padding: 0,
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                  gap: "0.75rem"
-                },
-                children: block.stats.map((stat) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-                  "li",
-                  {
-                    style: {
-                      borderRadius: 12,
-                      border: "1px solid rgba(255, 255, 255, 0.25)",
-                      padding: "0.75rem 1rem",
-                      background: "rgba(255, 255, 255, 0.12)",
-                      backdropFilter: "blur(4px)"
-                    },
-                    children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 22, fontWeight: 700 }, children: stat.value }),
-                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 12, letterSpacing: 0.3, textTransform: "uppercase", opacity: 0.8 }, children: stat.label })
-                    ]
+  const renderTextContent = (title, subtitle, ctaText, ctaLink, extraContent) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+    "div",
+    {
+      style: {
+        ...textAlignStyle,
+        display: "grid",
+        gap: "1rem",
+        width: "100%",
+        maxWidth: textMaxWidth,
+        ...contentPlacement
+      },
+      children: [
+        title && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { style: { margin: 0, fontSize: titleSize, lineHeight: 1.1, fontWeight: 700 }, children: title }),
+        subtitle && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: 0, fontSize: subtitleSize, lineHeight: 1.7, opacity: 0.85 }, children: subtitle }),
+        ctaText && ctaLink && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: textAlign }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", { href: ctaLink, style: buttonStyle, children: ctaText }) }),
+        extraContent
+      ]
+    }
+  );
+  if (block.variant === "carousel" && slidesCount > 0) {
+    const currentSlideData = slides[currentSlide];
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+      "section",
+      {
+        style: {
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          overflow: "hidden",
+          ...getBlockStyle(block)
+        },
+        onKeyDown: handleKeyDown,
+        tabIndex: 0,
+        role: "region",
+        "aria-label": "Carrousel",
+        "aria-roledescription": "carousel",
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                display: "flex",
+                transition: "transform 0.5s ease-in-out",
+                transform: `translateX(-${currentSlide * 100}%)`,
+                height: "100%"
+              },
+              children: slides.map((slide, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+                "div",
+                {
+                  role: "group",
+                  "aria-roledescription": "slide",
+                  "aria-label": `Slide ${index + 1} sur ${slidesCount}`,
+                  "aria-hidden": index !== currentSlide,
+                  style: {
+                    minWidth: "100%",
+                    minHeight: `${minHeight}vh`,
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   },
-                  stat.id
-                ))
+                  children: [
+                    slide.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                      "div",
+                      {
+                        style: {
+                          position: "absolute",
+                          inset: 0,
+                          backgroundImage: `url(${slide.imageUrl})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                          zIndex: 0
+                        },
+                        children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                          "div",
+                          {
+                            style: {
+                              position: "absolute",
+                              inset: 0,
+                              background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))"
+                            }
+                          }
+                        )
+                      }
+                    ),
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "relative", zIndex: 1, padding: "2rem 1rem", width: "100%" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { ...contentMaxWidth }, children: renderTextContent(slide.title, slide.subtitle, slide.ctaText, slide.ctaLink) }) })
+                  ]
+                },
+                slide.id
+              ))
+            }
+          ),
+          slidesCount > 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+              "button",
+              {
+                onClick: goToPrev,
+                style: { ...carouselNavButton, left: 16 },
+                "aria-label": "Slide pr\xE9c\xE9dent",
+                children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M15 18l-6-6 6-6" }) })
+              }
+            ),
+            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+              "button",
+              {
+                onClick: goToNext,
+                style: { ...carouselNavButton, right: 16 },
+                "aria-label": "Slide suivant",
+                children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", { d: "M9 18l6-6-6-6" }) })
               }
             )
-          ]
-        }
-      ),
-      !showImageFirst && block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: block.imageUrl, alt: block.title ?? "", style: imageStyle }) })
-    ] }),
-    block.variant === "carousel" && block.slides && block.slides.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "2rem", display: "grid", gap: "0.75rem" }, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", { style: { margin: 0, fontSize: 18 }, children: "Slides" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", { style: { margin: 0, paddingLeft: "1.25rem" }, children: block.slides.map((slide) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", { children: [
-        slide.title && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: slide.title }),
-        slide.subtitle && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-          " ",
-          slide.subtitle
-        ] })
-      ] }, slide.id)) })
-    ] })
-  ] });
+          ] }),
+          slidesCount > 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                position: "absolute",
+                bottom: 24,
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: 8,
+                zIndex: 10
+              },
+              role: "tablist",
+              "aria-label": "S\xE9lectionner un slide",
+              children: slides.map((slide, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                "button",
+                {
+                  onClick: () => goToSlide(index),
+                  role: "tab",
+                  "aria-selected": index === currentSlide,
+                  "aria-label": `Aller au slide ${index + 1}`,
+                  style: {
+                    ...carouselDot,
+                    background: index === currentSlide ? "#fff" : "rgba(255, 255, 255, 0.5)",
+                    transform: index === currentSlide ? "scale(1.2)" : "scale(1)"
+                  }
+                },
+                slide.id
+              ))
+            }
+          )
+        ]
+      }
+    );
+  }
+  if (block.variant === "cover") {
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+      "section",
+      {
+        style: {
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          display: "flex",
+          alignItems: "center",
+          ...getBlockStyle(block)
+        },
+        children: [
+          block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                position: "absolute",
+                inset: 0,
+                backgroundImage: `url(${block.imageUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                zIndex: 0
+              },
+              children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                "div",
+                {
+                  style: {
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5))"
+                  }
+                }
+              )
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "relative", zIndex: 1, width: "100%", padding: "4rem 1rem" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { ...contentMaxWidth }, children: renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink) }) })
+        ]
+      }
+    );
+  }
+  if (block.variant === "video") {
+    const isYouTube = block.videoUrl?.includes("youtube") || block.videoUrl?.includes("youtu.be");
+    const isVimeo = block.videoUrl?.includes("vimeo");
+    const isEmbed = isYouTube || isVimeo;
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+      "section",
+      {
+        style: {
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          display: "flex",
+          alignItems: "center",
+          overflow: "hidden",
+          ...getBlockStyle(block)
+        },
+        children: [
+          block.videoUrl && !isEmbed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "video",
+            {
+              autoPlay: true,
+              muted: true,
+              loop: true,
+              playsInline: true,
+              style: {
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                zIndex: 0
+              },
+              children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("source", { src: block.videoUrl, type: "video/mp4" })
+            }
+          ),
+          block.videoUrl && isEmbed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                position: "absolute",
+                inset: 0,
+                overflow: "hidden",
+                zIndex: 0
+              },
+              children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                "iframe",
+                {
+                  src: `${block.videoUrl}${block.videoUrl.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&controls=0&showinfo=0`,
+                  style: {
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    width: "180%",
+                    height: "180%",
+                    transform: "translate(-50%, -50%)",
+                    border: "none",
+                    pointerEvents: "none"
+                  },
+                  allow: "autoplay; encrypted-media",
+                  title: "Video background"
+                }
+              )
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+            "div",
+            {
+              style: {
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6))",
+                zIndex: 1
+              }
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { position: "relative", zIndex: 2, width: "100%", padding: "4rem 1rem" }, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { ...contentMaxWidth }, children: renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink) }) })
+        ]
+      }
+    );
+  }
+  if (block.variant === "split") {
+    const showImageFirst = block.imagePosition === "left";
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BlockSection, { block, style: getHeroSectionStyle(minHeight), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+      "div",
+      {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: "2rem",
+          alignItems: "center"
+        },
+        children: [
+          showImageFirst && block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: block.imageUrl, alt: block.title ?? "", style: imageStyle }) }),
+          renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink),
+          !showImageFirst && block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: block.imageUrl, alt: block.title ?? "", style: imageStyle }) })
+        ]
+      }
+    ) });
+  }
+  if (block.variant === "stats") {
+    const statsContent = block.stats && block.stats.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+      "ul",
+      {
+        style: {
+          listStyle: "none",
+          margin: "0.5rem 0 0",
+          padding: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: "0.75rem"
+        },
+        children: block.stats.map((stat) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+          "li",
+          {
+            style: {
+              borderRadius: 12,
+              border: "1px solid rgba(255, 255, 255, 0.25)",
+              padding: "0.75rem 1rem",
+              background: "rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(4px)"
+            },
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 22, fontWeight: 700 }, children: stat.value }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { fontSize: 12, letterSpacing: 0.3, textTransform: "uppercase", opacity: 0.8 }, children: stat.label })
+            ]
+          },
+          stat.id
+        ))
+      }
+    );
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BlockSection, { block, style: getHeroSectionStyle(minHeight), children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { display: "grid", gap: "1.75rem" }, children: renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink, statsContent) }) });
+  }
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BlockSection, { block, style: getHeroSectionStyle(minHeight), children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "grid", gap: "1.75rem" }, children: [
+    renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink),
+    block.imageUrl && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: block.imageUrl, alt: block.title ?? "", style: imageStyle }) })
+  ] }) });
 }
 function TextBlockView({ block }) {
   const align = block.alignment ?? "start";
@@ -525,7 +825,7 @@ function PageBuilderRenderer({
   content,
   components,
   filterHidden = false,
-  wrapper: Wrapper = React.Fragment,
+  wrapper: Wrapper = React2.Fragment,
   renderUnknown
 }) {
   const blocks = resolveBlocks(content);
@@ -535,14 +835,14 @@ function PageBuilderRenderer({
     }
     const Component = resolveComponent(block.type, components);
     if (!Component) {
-      return renderUnknown ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(React.Fragment, { children: renderUnknown(block) }, block.id) : null;
+      return renderUnknown ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(React2.Fragment, { children: renderUnknown(block) }, block.id) : null;
     }
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Component, { block }, block.id);
   }) });
 }
 
 // src/builder/PageBuilder.tsx
-var React2 = __toESM(require("react"));
+var React3 = __toESM(require("react"));
 
 // src/builder/defaults.ts
 function createId(prefix) {
@@ -886,11 +1186,11 @@ var BLOCK_LABELS = {
   composed: "Composed"
 };
 function useBuilderState(value) {
-  const [blocks, setBlocks] = React2.useState(value?.blocks ?? []);
-  const [selectedId, setSelectedId] = React2.useState(
+  const [blocks, setBlocks] = React3.useState(value?.blocks ?? []);
+  const [selectedId, setSelectedId] = React3.useState(
     value?.blocks?.[0]?.id ?? null
   );
-  React2.useEffect(() => {
+  React3.useEffect(() => {
     if (value?.blocks) {
       setBlocks(value.blocks);
       if (value.blocks.length === 0) {
@@ -964,7 +1264,7 @@ function MultilingualTextField({
   onChange,
   placeholder
 }) {
-  const [activeLang, setActiveLang] = React2.useState("fr");
+  const [activeLang, setActiveLang] = React3.useState("fr");
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gap: 6 }, children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FieldLabel, { children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(LanguageTabs, { activeLang, onChange: setActiveLang }),
@@ -986,7 +1286,7 @@ function TextField({
   placeholder,
   multilingual
 }) {
-  const [focused, setFocused] = React2.useState(false);
+  const [focused, setFocused] = React3.useState(false);
   if (multilingual) {
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(MultilingualTextField, { label, value, onChange, placeholder });
   }
@@ -1013,8 +1313,8 @@ function TextAreaField({
   multilingual,
   placeholder
 }) {
-  const [focused, setFocused] = React2.useState(false);
-  const [activeLang, setActiveLang] = React2.useState("fr");
+  const [focused, setFocused] = React3.useState(false);
+  const [activeLang, setActiveLang] = React3.useState("fr");
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gap: 6, minWidth: 0 }, children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FieldLabel, { children: label }),
     multilingual && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(LanguageTabs, { activeLang, onChange: setActiveLang }),
@@ -1064,7 +1364,7 @@ function SelectField({
   options,
   onChange
 }) {
-  const [focused, setFocused] = React2.useState(false);
+  const [focused, setFocused] = React3.useState(false);
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { style: { display: "grid", gap: 6 }, children: [
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(FieldLabel, { children: label }),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
@@ -1104,10 +1404,10 @@ function ImageUploadField({
   onChange,
   onUpload
 }) {
-  const [preview, setPreview] = React2.useState(value ?? null);
-  const [uploading, setUploading] = React2.useState(false);
-  const fileInputRef = React2.useRef(null);
-  React2.useEffect(() => {
+  const [preview, setPreview] = React3.useState(value ?? null);
+  const [uploading, setUploading] = React3.useState(false);
+  const fileInputRef = React3.useRef(null);
+  React3.useEffect(() => {
     if (value) {
       setPreview(value);
     }
@@ -1255,8 +1555,8 @@ function GradientField({
     }
     return { color1: "#0f172a", color2: "#2563eb", direction: "120deg" };
   };
-  const [gradientState, setGradientState] = React2.useState(() => parseGradient(value));
-  React2.useEffect(() => {
+  const [gradientState, setGradientState] = React3.useState(() => parseGradient(value));
+  React3.useEffect(() => {
     setGradientState(parseGradient(value));
   }, [value]);
   const updateGradient = (updates) => {
@@ -2625,7 +2925,7 @@ function PageBuilder({
   publishing = false
 }) {
   const { blocks, setBlocks, selectedId, setSelectedId } = useBuilderState(value);
-  const [activeTab, setActiveTab] = React2.useState("blocks");
+  const [activeTab, setActiveTab] = React3.useState("blocks");
   if (mode === "view") {
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(PageBuilderRenderer, { content: value ?? { blocks }, filterHidden: true });
   }

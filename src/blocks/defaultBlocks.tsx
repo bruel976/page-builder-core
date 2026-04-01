@@ -97,25 +97,73 @@ function BlockSection({
   );
 }
 
+// Carousel navigation button styles
+const carouselNavButton: React.CSSProperties = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  width: 48,
+  height: 48,
+  borderRadius: "50%",
+  border: "none",
+  background: "rgba(255, 255, 255, 0.9)",
+  color: "#1e293b",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  zIndex: 10,
+  transition: "background 0.2s, transform 0.2s",
+};
+
+const carouselDot: React.CSSProperties = {
+  width: 10,
+  height: 10,
+  borderRadius: "50%",
+  border: "none",
+  cursor: "pointer",
+  transition: "background 0.2s, transform 0.2s",
+};
+
 export function HeroBlockView({ block }: { block: HeroBlock }) {
-  const layout: React.CSSProperties =
-    block.variant === "split"
-      ? {
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: "2rem",
-          alignItems: "center",
-        }
-      : {
-          display: "grid",
-          gap: "1.75rem",
-        };
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const slides = block.slides ?? [];
+  const slidesCount = slides.length;
+
+  // Auto-advance carousel every 5 seconds
+  React.useEffect(() => {
+    if (block.variant !== "carousel" || slidesCount <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slidesCount);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [block.variant, slidesCount]);
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + slidesCount) % slidesCount);
+  };
+
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % slidesCount);
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") goToPrev();
+    if (e.key === "ArrowRight") goToNext();
+  };
 
   const textAlign = block.textAlignment ?? "start";
   const contentAlign = block.contentAlign ?? "start";
   const textMaxWidth = 680;
   const titleSize = block.titleSize ?? 42;
   const subtitleSize = block.subtitleSize ?? 18;
+  const minHeight = block.minHeight ?? 55;
 
   const contentPlacement =
     contentAlign === "center"
@@ -123,93 +171,385 @@ export function HeroBlockView({ block }: { block: HeroBlock }) {
       : contentAlign === "end"
       ? { marginLeft: "auto", justifySelf: "end" as const }
       : { justifySelf: "start" as const };
+
   const textAlignStyle: React.CSSProperties = {
     textAlign: textAlign as React.CSSProperties["textAlign"],
   };
 
-  const showImageFirst = block.variant === "split" && block.imagePosition === "left";
+  // Render text content (reused across variants)
+  const renderTextContent = (
+    title?: string,
+    subtitle?: string,
+    ctaText?: string,
+    ctaLink?: string,
+    extraContent?: React.ReactNode,
+  ) => (
+    <div
+      style={{
+        ...textAlignStyle,
+        display: "grid",
+        gap: "1rem",
+        width: "100%",
+        maxWidth: textMaxWidth,
+        ...contentPlacement,
+      }}
+    >
+      {title && (
+        <h1 style={{ margin: 0, fontSize: titleSize, lineHeight: 1.1, fontWeight: 700 }}>{title}</h1>
+      )}
+      {subtitle && (
+        <p style={{ margin: 0, fontSize: subtitleSize, lineHeight: 1.7, opacity: 0.85 }}>{subtitle}</p>
+      )}
+      {ctaText && ctaLink && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: textAlign }}>
+          <a href={ctaLink} style={buttonStyle}>
+            {ctaText}
+          </a>
+        </div>
+      )}
+      {extraContent}
+    </div>
+  );
 
-  return (
-    <BlockSection block={block} style={getHeroSectionStyle(block.minHeight)}>
-      <div style={layout}>
-        {showImageFirst && block.imageUrl && (
-          <div>
-            <img src={block.imageUrl} alt={block.title ?? ""} style={imageStyle} />
-          </div>
-        )}
+  // CAROUSEL variant
+  if (block.variant === "carousel" && slidesCount > 0) {
+    const currentSlideData = slides[currentSlide];
+    return (
+      <section
+        style={{
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          overflow: "hidden",
+          ...getBlockStyle(block),
+        }}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="region"
+        aria-label="Carrousel"
+        aria-roledescription="carousel"
+      >
+        {/* Slides container */}
         <div
           style={{
-            ...textAlignStyle,
-            display: "grid",
-            gap: "1rem",
-            width: "100%",
-            maxWidth: textMaxWidth,
-            ...contentPlacement,
+            display: "flex",
+            transition: "transform 0.5s ease-in-out",
+            transform: `translateX(-${currentSlide * 100}%)`,
+            height: "100%",
           }}
         >
-          {block.title && (
-            <h1 style={{ margin: 0, fontSize: titleSize, lineHeight: 1.1, fontWeight: 700 }}>{block.title}</h1>
-          )}
-          {block.subtitle && (
-            <p style={{ margin: 0, fontSize: subtitleSize, lineHeight: 1.7, opacity: 0.85 }}>{block.subtitle}</p>
-          )}
-          {block.ctaText && block.ctaLink && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
-              <a href={block.ctaLink} style={buttonStyle}>
-                {block.ctaText}
-              </a>
-            </div>
-          )}
-          {block.variant === "stats" && block.stats && block.stats.length > 0 && (
-            <ul
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`Slide ${index + 1} sur ${slidesCount}`}
+              aria-hidden={index !== currentSlide}
               style={{
-                listStyle: "none",
-                margin: "0.5rem 0 0",
-                padding: 0,
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                gap: "0.75rem",
+                minWidth: "100%",
+                minHeight: `${minHeight}vh`,
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {block.stats.map((stat) => (
-                <li
-                  key={stat.id}
+              {/* Background image */}
+              {slide.imageUrl && (
+                <div
                   style={{
-                    borderRadius: 12,
-                    border: "1px solid rgba(255, 255, 255, 0.25)",
-                    padding: "0.75rem 1rem",
-                    background: "rgba(255, 255, 255, 0.12)",
-                    backdropFilter: "blur(4px)",
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: `url(${slide.imageUrl})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    zIndex: 0,
                   }}
                 >
-                  <div style={{ fontSize: 22, fontWeight: 700 }}>{stat.value}</div>
-                  <div style={{ fontSize: 12, letterSpacing: 0.3, textTransform: "uppercase", opacity: 0.8 }}>
-                    {stat.label}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))",
+                    }}
+                  />
+                </div>
+              )}
+              {/* Content */}
+              <div style={{ position: "relative", zIndex: 1, padding: "2rem 1rem", width: "100%" }}>
+                <div style={{ ...contentMaxWidth }}>
+                  {renderTextContent(slide.title, slide.subtitle, slide.ctaText, slide.ctaLink)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation arrows */}
+        {slidesCount > 1 && (
+          <>
+            <button
+              onClick={goToPrev}
+              style={{ ...carouselNavButton, left: 16 }}
+              aria-label="Slide précédent"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={goToNext}
+              style={{ ...carouselNavButton, right: 16 }}
+              aria-label="Slide suivant"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* Dots */}
+        {slidesCount > 1 && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              gap: 8,
+              zIndex: 10,
+            }}
+            role="tablist"
+            aria-label="Sélectionner un slide"
+          >
+            {slides.map((slide, index) => (
+              <button
+                key={slide.id}
+                onClick={() => goToSlide(index)}
+                role="tab"
+                aria-selected={index === currentSlide}
+                aria-label={`Aller au slide ${index + 1}`}
+                style={{
+                  ...carouselDot,
+                  background: index === currentSlide ? "#fff" : "rgba(255, 255, 255, 0.5)",
+                  transform: index === currentSlide ? "scale(1.2)" : "scale(1)",
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // COVER variant - full background image
+  if (block.variant === "cover") {
+    return (
+      <section
+        style={{
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          display: "flex",
+          alignItems: "center",
+          ...getBlockStyle(block),
+        }}
+      >
+        {/* Background image */}
+        {block.imageUrl && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${block.imageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              zIndex: 0,
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5))",
+              }}
+            />
+          </div>
+        )}
+        {/* Content */}
+        <div style={{ position: "relative", zIndex: 1, width: "100%", padding: "4rem 1rem" }}>
+          <div style={{ ...contentMaxWidth }}>
+            {renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // VIDEO variant - video background or embedded
+  if (block.variant === "video") {
+    const isYouTube = block.videoUrl?.includes("youtube") || block.videoUrl?.includes("youtu.be");
+    const isVimeo = block.videoUrl?.includes("vimeo");
+    const isEmbed = isYouTube || isVimeo;
+
+    return (
+      <section
+        style={{
+          position: "relative",
+          minHeight: `${minHeight}vh`,
+          display: "flex",
+          alignItems: "center",
+          overflow: "hidden",
+          ...getBlockStyle(block),
+        }}
+      >
+        {/* Video background */}
+        {block.videoUrl && !isEmbed && (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              zIndex: 0,
+            }}
+          >
+            <source src={block.videoUrl} type="video/mp4" />
+          </video>
+        )}
+        {/* YouTube/Vimeo embed background */}
+        {block.videoUrl && isEmbed && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              overflow: "hidden",
+              zIndex: 0,
+            }}
+          >
+            <iframe
+              src={`${block.videoUrl}${block.videoUrl.includes("?") ? "&" : "?"}autoplay=1&mute=1&loop=1&controls=0&showinfo=0`}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "180%",
+                height: "180%",
+                transform: "translate(-50%, -50%)",
+                border: "none",
+                pointerEvents: "none",
+              }}
+              allow="autoplay; encrypted-media"
+              title="Video background"
+            />
+          </div>
+        )}
+        {/* Overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.6))",
+            zIndex: 1,
+          }}
+        />
+        {/* Content */}
+        <div style={{ position: "relative", zIndex: 2, width: "100%", padding: "4rem 1rem" }}>
+          <div style={{ ...contentMaxWidth }}>
+            {renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink)}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // SPLIT variant
+  if (block.variant === "split") {
+    const showImageFirst = block.imagePosition === "left";
+    return (
+      <BlockSection block={block} style={getHeroSectionStyle(minHeight)}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "2rem",
+            alignItems: "center",
+          }}
+        >
+          {showImageFirst && block.imageUrl && (
+            <div>
+              <img src={block.imageUrl} alt={block.title ?? ""} style={imageStyle} />
+            </div>
+          )}
+          {renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink)}
+          {!showImageFirst && block.imageUrl && (
+            <div>
+              <img src={block.imageUrl} alt={block.title ?? ""} style={imageStyle} />
+            </div>
           )}
         </div>
-        {!showImageFirst && block.imageUrl && (
+      </BlockSection>
+    );
+  }
+
+  // STATS variant
+  if (block.variant === "stats") {
+    const statsContent = block.stats && block.stats.length > 0 && (
+      <ul
+        style={{
+          listStyle: "none",
+          margin: "0.5rem 0 0",
+          padding: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: "0.75rem",
+        }}
+      >
+        {block.stats.map((stat) => (
+          <li
+            key={stat.id}
+            style={{
+              borderRadius: 12,
+              border: "1px solid rgba(255, 255, 255, 0.25)",
+              padding: "0.75rem 1rem",
+              background: "rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(4px)",
+            }}
+          >
+            <div style={{ fontSize: 22, fontWeight: 700 }}>{stat.value}</div>
+            <div style={{ fontSize: 12, letterSpacing: 0.3, textTransform: "uppercase", opacity: 0.8 }}>
+              {stat.label}
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+
+    return (
+      <BlockSection block={block} style={getHeroSectionStyle(minHeight)}>
+        <div style={{ display: "grid", gap: "1.75rem" }}>
+          {renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink, statsContent)}
+        </div>
+      </BlockSection>
+    );
+  }
+
+  // SIMPLE variant (default)
+  return (
+    <BlockSection block={block} style={getHeroSectionStyle(minHeight)}>
+      <div style={{ display: "grid", gap: "1.75rem" }}>
+        {renderTextContent(block.title, block.subtitle, block.ctaText, block.ctaLink)}
+        {block.imageUrl && (
           <div>
             <img src={block.imageUrl} alt={block.title ?? ""} style={imageStyle} />
           </div>
         )}
       </div>
-      {block.variant === "carousel" && block.slides && block.slides.length > 0 && (
-        <div style={{ marginTop: "2rem", display: "grid", gap: "0.75rem" }}>
-          <h3 style={{ margin: 0, fontSize: 18 }}>Slides</h3>
-          <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
-            {block.slides.map((slide) => (
-              <li key={slide.id}>
-                {slide.title && <strong>{slide.title}</strong>}
-                {slide.subtitle && <span> {slide.subtitle}</span>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </BlockSection>
   );
 }
