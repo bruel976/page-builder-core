@@ -7,7 +7,6 @@ import type {
   FaqBlock,
   GalleryBlock,
   HeroBlock,
-  HeroSlide,
   IconListBlock,
   ImageBlock,
   PageContent,
@@ -725,13 +724,10 @@ function BlockEditor({
   onImageUpload,
 }: {
   block: Block;
-  onChange: (updated: Block | ((prev: Block) => Block)) => void;
+  onChange: (updated: Block) => void;
   onImageUpload?: (file: File) => Promise<string>;
 }) {
   const update = (patch: Partial<Block>) => onChange({ ...block, ...patch } as Block);
-  const updateFn = (fn: (prev: Block) => Partial<Block>) => {
-    onChange((prev) => ({ ...prev, ...fn(prev) } as Block));
-  };
 
   const renderCommon = () => (
     <div style={{ display: "grid", gap: 12 }}>
@@ -778,22 +774,6 @@ function BlockEditor({
   switch (block.type) {
     case "hero": {
       const hero = block as HeroBlock;
-      const moveSlide = (from: number, to: number) => {
-        if (from < 0 || to < 0 || from >= (hero.slides?.length ?? 0) || to >= (hero.slides?.length ?? 0)) return;
-        const next = arrayMove(hero.slides ?? [], from, to);
-        update({ slides: next });
-      };
-      const removeSlide = (id: string) => {
-        update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
-      };
-      const updateSlide = (slideId: string, props: Partial<HeroSlide>) => {
-        // Utilise updateFn pour toujours travailler avec le dernier état
-        updateFn((prev) => ({
-          slides: ((prev as HeroBlock).slides ?? []).map((s) =>
-            s.id === slideId ? { ...s, ...props } : s
-          ),
-        }));
-      };
       return (
         <div style={{ display: "grid", gap: 16 }}>
           <SelectField
@@ -805,7 +785,6 @@ function BlockEditor({
               { value: "cover", label: "Cover" },
               { value: "video", label: "Video" },
               { value: "stats", label: "Stats" },
-              { value: "carousel", label: "Carousel" },
             ]}
             onChange={(value) => update({ variant: value as HeroBlock["variant"] })}
           />
@@ -953,120 +932,6 @@ function BlockEditor({
                 }
               >
                 + Ajouter une stat
-              </button>
-            </div>
-          )}
-          {hero.variant === "carousel" && (
-            <div style={{ display: "grid", gap: 8 }}>
-              <SectionTitle>Slides</SectionTitle>
-              {hero.slides && hero.slides.length > 0 && (
-                <div style={{ display: "grid", gap: 8 }}>
-                  {hero.slides.map((slide, index) => (
-                    <div
-                      key={slide.id}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "0.75rem",
-                        borderRadius: 8,
-                        border: "1px solid var(--pb-border)",
-                        background: "var(--pb-bg)",
-                      }}
-                    >
-                      <DragHandle />
-                      <div style={{ flex: 1, display: "grid", gap: 6 }}>
-                        <TextField
-                          label=""
-                          value={slide.title ?? ""}
-                          onChange={(value) => updateSlide(slide.id, { title: value })}
-                          placeholder="Titre"
-                        />
-                        <TextField
-                          label=""
-                          value={slide.subtitle ?? ""}
-                          onChange={(value) => updateSlide(slide.id, { subtitle: value })}
-                          placeholder="Sous-titre"
-                        />
-                        <ImageUploadField
-                          label=""
-                          value={slide.imageUrl ?? ""}
-                          onChange={(value) => updateSlide(slide.id, { imageUrl: value })}
-                          onUpload={onImageUpload}
-                        />
-                        <TextField
-                          label=""
-                          value={slide.ctaText ?? ""}
-                          onChange={(value) => updateSlide(slide.id, { ctaText: value })}
-                          placeholder="Texte CTA"
-                        />
-                        <TextField
-                          label=""
-                          value={slide.ctaLink ?? ""}
-                          onChange={(value) => updateSlide(slide.id, { ctaLink: value })}
-                          placeholder="Lien CTA"
-                        />
-                      </div>
-                      <div style={{ display: "flex", gap: 4, flexDirection: "column" }}>
-                        <button
-                          type="button"
-                          style={iconButton}
-                          onClick={() => moveSlide(index, index - 1)}
-                          disabled={index === 0}
-                          title="Déplacer vers le haut"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 15l-6-6-6 6" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          style={iconButton}
-                          onClick={() => moveSlide(index, index + 1)}
-                          disabled={index === (hero.slides?.length ?? 0) - 1}
-                          title="Déplacer vers le bas"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M6 9l6 6 6-6" />
-                          </svg>
-                        </button>
-                        <button
-                          type="button"
-                          style={iconButton}
-                          onClick={() => removeSlide(slide.id)}
-                          title="Supprimer"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <button
-                type="button"
-                style={{
-                  ...actionButton,
-                  padding: "0.5rem 0.75rem",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  borderStyle: "dashed",
-                  borderColor: "var(--pb-border)",
-                  background: "var(--pb-bg)",
-                  color: "var(--pb-text-muted)",
-                }}
-                onClick={() =>
-                  update({
-                    slides: [
-                      ...(hero.slides ?? []),
-                      { id: createId("slide"), title: "", subtitle: "", imageUrl: "", ctaText: "", ctaLink: "" },
-                    ],
-                  })
-                }
-              >
-                + Ajouter un slide
               </button>
             </div>
           )}
@@ -1782,19 +1647,9 @@ export function PageBuilder({
     emit(arrayMove(blocks, from, to));
   };
 
-  const updateBlock = (updated: Block | ((prev: Block) => Block)) => {
-    if (typeof updated === "function") {
-      const next = blocks.map((block) => {
-        if (block.id === selectedId) {
-          return updated(block);
-        }
-        return block;
-      });
-      emit(next);
-    } else {
-      const next = blocks.map((block) => (block.id === updated.id ? updated : block));
-      emit(next);
-    }
+  const updateBlock = (updated: Block) => {
+    const next = blocks.map((block) => (block.id === updated.id ? updated : block));
+    emit(next);
   };
 
   const toggleBlockVisibility = (id: string) => {

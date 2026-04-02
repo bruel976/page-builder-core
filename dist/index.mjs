@@ -2877,6 +2877,13 @@ function PageBuilder({
     setBlocks(next);
     onChange?.({ blocks: next, metadata: value?.metadata });
   };
+  const emitFn = (fn) => {
+    setBlocks((prev) => {
+      const next = fn(prev);
+      onChange?.({ blocks: next, metadata: value?.metadata });
+      return next;
+    });
+  };
   const emitWithMetadata = (metadata) => {
     onChange?.({ blocks, metadata });
   };
@@ -2904,15 +2911,20 @@ function PageBuilder({
     if (from < 0 || to < 0 || from >= blocks.length || to >= blocks.length) return;
     emit(arrayMove(blocks, from, to));
   };
+  const selectedIdRef = React3.useRef(selectedId);
+  React3.useEffect(() => {
+    selectedIdRef.current = selectedId;
+  }, [selectedId]);
   const updateBlock = (updated) => {
     if (typeof updated === "function") {
-      const next = blocks.map((block) => {
-        if (block.id === selectedId) {
-          return updated(block);
-        }
-        return block;
-      });
-      emit(next);
+      emitFn(
+        (prevBlocks) => prevBlocks.map((block) => {
+          if (block.id === selectedIdRef.current) {
+            return updated(block);
+          }
+          return block;
+        })
+      );
     } else {
       const next = blocks.map((block) => block.id === updated.id ? updated : block);
       emit(next);
