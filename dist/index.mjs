@@ -1,7 +1,4 @@
 // src/renderer.tsx
-import * as React2 from "react";
-
-// src/blocks/defaultBlocks.tsx
 import * as React from "react";
 
 // src/utils/style.ts
@@ -25,7 +22,7 @@ function getBlockStyle(block) {
 }
 
 // src/blocks/defaultBlocks.tsx
-import { Fragment, jsx, jsxs } from "react/jsx-runtime";
+import { jsx, jsxs } from "react/jsx-runtime";
 var sectionBaseStyle = {
   padding: "2.5rem 1rem"
 };
@@ -85,56 +82,7 @@ function BlockSection({
 }) {
   return /* @__PURE__ */ jsx("section", { style: { ...sectionBaseStyle, ...getBlockStyle(block), ...style }, children: /* @__PURE__ */ jsx("div", { style: contentMaxWidth, children }) });
 }
-var carouselNavButton = {
-  position: "absolute",
-  top: "50%",
-  transform: "translateY(-50%)",
-  width: 48,
-  height: 48,
-  borderRadius: "50%",
-  border: "none",
-  background: "rgba(255, 255, 255, 0.9)",
-  color: "#1e293b",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-  zIndex: 10,
-  transition: "background 0.2s, transform 0.2s"
-};
-var carouselDot = {
-  width: 10,
-  height: 10,
-  borderRadius: "50%",
-  border: "none",
-  cursor: "pointer",
-  transition: "background 0.2s, transform 0.2s"
-};
 function HeroBlockView({ block }) {
-  const [currentSlide, setCurrentSlide] = React.useState(0);
-  const slides = block.slides ?? [];
-  const slidesCount = slides.length;
-  React.useEffect(() => {
-    if (block.variant !== "carousel" || slidesCount <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slidesCount);
-    }, 5e3);
-    return () => clearInterval(interval);
-  }, [block.variant, slidesCount]);
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-  const goToPrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + slidesCount) % slidesCount);
-  };
-  const goToNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % slidesCount);
-  };
-  const handleKeyDown = (e) => {
-    if (e.key === "ArrowLeft") goToPrev();
-    if (e.key === "ArrowRight") goToNext();
-  };
   const textAlign = block.textAlignment ?? "start";
   const contentAlign = block.contentAlign ?? "start";
   const textMaxWidth = 680;
@@ -164,133 +112,6 @@ function HeroBlockView({ block }) {
       ]
     }
   );
-  if (block.variant === "carousel" && slidesCount > 0) {
-    const currentSlideData = slides[currentSlide];
-    return /* @__PURE__ */ jsxs(
-      "section",
-      {
-        style: {
-          position: "relative",
-          minHeight: `${minHeight}vh`,
-          overflow: "hidden",
-          ...getBlockStyle(block)
-        },
-        onKeyDown: handleKeyDown,
-        tabIndex: 0,
-        role: "region",
-        "aria-label": "Carrousel",
-        "aria-roledescription": "carousel",
-        children: [
-          /* @__PURE__ */ jsx(
-            "div",
-            {
-              style: {
-                display: "flex",
-                transition: "transform 0.5s ease-in-out",
-                transform: `translateX(-${currentSlide * 100}%)`,
-                height: "100%"
-              },
-              children: slides.map((slide, index) => /* @__PURE__ */ jsxs(
-                "div",
-                {
-                  role: "group",
-                  "aria-roledescription": "slide",
-                  "aria-label": `Slide ${index + 1} sur ${slidesCount}`,
-                  "aria-hidden": index !== currentSlide,
-                  style: {
-                    minWidth: "100%",
-                    minHeight: `${minHeight}vh`,
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  },
-                  children: [
-                    slide.imageUrl && /* @__PURE__ */ jsx(
-                      "div",
-                      {
-                        style: {
-                          position: "absolute",
-                          inset: 0,
-                          backgroundImage: `url(${slide.imageUrl})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          zIndex: 0
-                        },
-                        children: /* @__PURE__ */ jsx(
-                          "div",
-                          {
-                            style: {
-                              position: "absolute",
-                              inset: 0,
-                              background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))"
-                            }
-                          }
-                        )
-                      }
-                    ),
-                    /* @__PURE__ */ jsx("div", { style: { position: "relative", zIndex: 1, padding: "2rem 1rem", width: "100%" }, children: /* @__PURE__ */ jsx("div", { style: { ...contentMaxWidth }, children: renderTextContent(slide.title, slide.subtitle, slide.ctaText, slide.ctaLink) }) })
-                  ]
-                },
-                slide.id
-              ))
-            }
-          ),
-          slidesCount > 1 && /* @__PURE__ */ jsxs(Fragment, { children: [
-            /* @__PURE__ */ jsx(
-              "button",
-              {
-                onClick: goToPrev,
-                style: { ...carouselNavButton, left: 16 },
-                "aria-label": "Slide pr\xE9c\xE9dent",
-                children: /* @__PURE__ */ jsx("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ jsx("path", { d: "M15 18l-6-6 6-6" }) })
-              }
-            ),
-            /* @__PURE__ */ jsx(
-              "button",
-              {
-                onClick: goToNext,
-                style: { ...carouselNavButton, right: 16 },
-                "aria-label": "Slide suivant",
-                children: /* @__PURE__ */ jsx("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2.5", children: /* @__PURE__ */ jsx("path", { d: "M9 18l6-6-6-6" }) })
-              }
-            )
-          ] }),
-          slidesCount > 1 && /* @__PURE__ */ jsx(
-            "div",
-            {
-              style: {
-                position: "absolute",
-                bottom: 24,
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                gap: 8,
-                zIndex: 10
-              },
-              role: "tablist",
-              "aria-label": "S\xE9lectionner un slide",
-              children: slides.map((slide, index) => /* @__PURE__ */ jsx(
-                "button",
-                {
-                  onClick: () => goToSlide(index),
-                  role: "tab",
-                  "aria-selected": index === currentSlide,
-                  "aria-label": `Aller au slide ${index + 1}`,
-                  style: {
-                    ...carouselDot,
-                    background: index === currentSlide ? "#fff" : "rgba(255, 255, 255, 0.5)",
-                    transform: index === currentSlide ? "scale(1.2)" : "scale(1)"
-                  }
-                },
-                slide.id
-              ))
-            }
-          )
-        ]
-      }
-    );
-  }
   if (block.variant === "cover") {
     return /* @__PURE__ */ jsxs(
       "section",
@@ -773,7 +594,7 @@ function PageBuilderRenderer({
   content,
   components,
   filterHidden = false,
-  wrapper: Wrapper = React2.Fragment,
+  wrapper: Wrapper = React.Fragment,
   renderUnknown
 }) {
   const blocks = resolveBlocks(content);
@@ -783,14 +604,14 @@ function PageBuilderRenderer({
     }
     const Component = resolveComponent(block.type, components);
     if (!Component) {
-      return renderUnknown ? /* @__PURE__ */ jsx2(React2.Fragment, { children: renderUnknown(block) }, block.id) : null;
+      return renderUnknown ? /* @__PURE__ */ jsx2(React.Fragment, { children: renderUnknown(block) }, block.id) : null;
     }
     return /* @__PURE__ */ jsx2(Component, { block }, block.id);
   }) });
 }
 
 // src/builder/PageBuilder.tsx
-import * as React3 from "react";
+import * as React2 from "react";
 
 // src/builder/defaults.ts
 function createId(prefix) {
@@ -1099,7 +920,7 @@ function BlockIcon({ type, size = 20, color = "#64748b" }) {
 }
 
 // src/builder/PageBuilder.tsx
-import { Fragment as Fragment3, jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
+import { Fragment as Fragment2, jsx as jsx4, jsxs as jsxs3 } from "react/jsx-runtime";
 var DEFAULT_BLOCKS = [
   "hero",
   "text",
@@ -1134,11 +955,11 @@ var BLOCK_LABELS = {
   composed: "Composed"
 };
 function useBuilderState(value) {
-  const [blocks, setBlocks] = React3.useState(value?.blocks ?? []);
-  const [selectedId, setSelectedId] = React3.useState(
+  const [blocks, setBlocks] = React2.useState(value?.blocks ?? []);
+  const [selectedId, setSelectedId] = React2.useState(
     value?.blocks?.[0]?.id ?? null
   );
-  React3.useEffect(() => {
+  React2.useEffect(() => {
     if (value?.blocks) {
       setBlocks(value.blocks);
       if (value.blocks.length === 0) {
@@ -1212,7 +1033,7 @@ function MultilingualTextField({
   onChange,
   placeholder
 }) {
-  const [activeLang, setActiveLang] = React3.useState("fr");
+  const [activeLang, setActiveLang] = React2.useState("fr");
   return /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 6 }, children: [
     /* @__PURE__ */ jsx4(FieldLabel, { children: label }),
     /* @__PURE__ */ jsx4(LanguageTabs, { activeLang, onChange: setActiveLang }),
@@ -1234,7 +1055,7 @@ function TextField({
   placeholder,
   multilingual
 }) {
-  const [focused, setFocused] = React3.useState(false);
+  const [focused, setFocused] = React2.useState(false);
   if (multilingual) {
     return /* @__PURE__ */ jsx4(MultilingualTextField, { label, value, onChange, placeholder });
   }
@@ -1261,8 +1082,8 @@ function TextAreaField({
   multilingual,
   placeholder
 }) {
-  const [focused, setFocused] = React3.useState(false);
-  const [activeLang, setActiveLang] = React3.useState("fr");
+  const [focused, setFocused] = React2.useState(false);
+  const [activeLang, setActiveLang] = React2.useState("fr");
   return /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 6, minWidth: 0 }, children: [
     /* @__PURE__ */ jsx4(FieldLabel, { children: label }),
     multilingual && /* @__PURE__ */ jsx4(LanguageTabs, { activeLang, onChange: setActiveLang }),
@@ -1312,7 +1133,7 @@ function SelectField({
   options,
   onChange
 }) {
-  const [focused, setFocused] = React3.useState(false);
+  const [focused, setFocused] = React2.useState(false);
   return /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 6 }, children: [
     /* @__PURE__ */ jsx4(FieldLabel, { children: label }),
     /* @__PURE__ */ jsx4(
@@ -1352,14 +1173,14 @@ function ImageUploadField({
   onChange,
   onUpload
 }) {
-  const [preview, setPreview] = React3.useState(value ?? null);
-  const [uploading, setUploading] = React3.useState(false);
-  const fileInputRef = React3.useRef(null);
-  const onChangeRef = React3.useRef(onChange);
-  React3.useEffect(() => {
+  const [preview, setPreview] = React2.useState(value ?? null);
+  const [uploading, setUploading] = React2.useState(false);
+  const fileInputRef = React2.useRef(null);
+  const onChangeRef = React2.useRef(onChange);
+  React2.useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
-  React3.useEffect(() => {
+  React2.useEffect(() => {
     if (value) {
       setPreview(value);
     }
@@ -1507,8 +1328,8 @@ function GradientField({
     }
     return { color1: "#0f172a", color2: "#2563eb", direction: "120deg" };
   };
-  const [gradientState, setGradientState] = React3.useState(() => parseGradient(value));
-  React3.useEffect(() => {
+  const [gradientState, setGradientState] = React2.useState(() => parseGradient(value));
+  React2.useEffect(() => {
     setGradientState(parseGradient(value));
   }, [value]);
   const updateGradient = (updates) => {
@@ -1715,9 +1536,6 @@ function BlockEditor({
   onImageUpload
 }) {
   const update = (patch) => onChange({ ...block, ...patch });
-  const updateFn = (fn) => {
-    onChange((prev) => ({ ...prev, ...fn(prev) }));
-  };
   const renderCommon = () => /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 12 }, children: [
     /* @__PURE__ */ jsx4(
       SelectField,
@@ -1769,21 +1587,6 @@ function BlockEditor({
   switch (block.type) {
     case "hero": {
       const hero = block;
-      const moveSlide = (from, to) => {
-        if (from < 0 || to < 0 || from >= (hero.slides?.length ?? 0) || to >= (hero.slides?.length ?? 0)) return;
-        const next = arrayMove(hero.slides ?? [], from, to);
-        update({ slides: next });
-      };
-      const removeSlide = (id) => {
-        update({ slides: (hero.slides ?? []).filter((s) => s.id !== id) });
-      };
-      const updateSlide = (slideId, props) => {
-        updateFn((prev) => ({
-          slides: (prev.slides ?? []).map(
-            (s) => s.id === slideId ? { ...s, ...props } : s
-          )
-        }));
-      };
       return /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 16 }, children: [
         /* @__PURE__ */ jsx4(
           SelectField,
@@ -1795,8 +1598,7 @@ function BlockEditor({
               { value: "split", label: "Split" },
               { value: "cover", label: "Cover" },
               { value: "video", label: "Video" },
-              { value: "stats", label: "Stats" },
-              { value: "carousel", label: "Carousel" }
+              { value: "stats", label: "Stats" }
             ],
             onChange: (value) => update({ variant: value })
           }
@@ -1893,7 +1695,7 @@ function BlockEditor({
             placeholder: "/contact"
           }
         ),
-        (hero.variant === "split" || hero.variant === "cover" || hero.variant === "simple") && /* @__PURE__ */ jsxs3(Fragment3, { children: [
+        (hero.variant === "split" || hero.variant === "cover" || hero.variant === "simple") && /* @__PURE__ */ jsxs3(Fragment2, { children: [
           /* @__PURE__ */ jsx4(
             ImageUploadField,
             {
@@ -1973,131 +1775,6 @@ function BlockEditor({
                 stats: [...hero.stats ?? [], { id: createId("stat"), label: "Label", value: "0" }]
               }),
               children: "+ Ajouter une stat"
-            }
-          )
-        ] }),
-        hero.variant === "carousel" && /* @__PURE__ */ jsxs3("div", { style: { display: "grid", gap: 8 }, children: [
-          /* @__PURE__ */ jsx4(SectionTitle, { children: "Slides" }),
-          hero.slides && hero.slides.length > 0 && /* @__PURE__ */ jsx4("div", { style: { display: "grid", gap: 8 }, children: hero.slides.map((slide, index) => /* @__PURE__ */ jsxs3(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "0.75rem",
-                borderRadius: 8,
-                border: "1px solid var(--pb-border)",
-                background: "var(--pb-bg)"
-              },
-              children: [
-                /* @__PURE__ */ jsx4(DragHandle, {}),
-                /* @__PURE__ */ jsxs3("div", { style: { flex: 1, display: "grid", gap: 6 }, children: [
-                  /* @__PURE__ */ jsx4(
-                    TextField,
-                    {
-                      label: "",
-                      value: slide.title ?? "",
-                      onChange: (value) => updateSlide(slide.id, { title: value }),
-                      placeholder: "Titre"
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    TextField,
-                    {
-                      label: "",
-                      value: slide.subtitle ?? "",
-                      onChange: (value) => updateSlide(slide.id, { subtitle: value }),
-                      placeholder: "Sous-titre"
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    ImageUploadField,
-                    {
-                      label: "",
-                      value: slide.imageUrl ?? "",
-                      onChange: (value) => updateSlide(slide.id, { imageUrl: value }),
-                      onUpload: onImageUpload
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    TextField,
-                    {
-                      label: "",
-                      value: slide.ctaText ?? "",
-                      onChange: (value) => updateSlide(slide.id, { ctaText: value }),
-                      placeholder: "Texte CTA"
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    TextField,
-                    {
-                      label: "",
-                      value: slide.ctaLink ?? "",
-                      onChange: (value) => updateSlide(slide.id, { ctaLink: value }),
-                      placeholder: "Lien CTA"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxs3("div", { style: { display: "flex", gap: 4, flexDirection: "column" }, children: [
-                  /* @__PURE__ */ jsx4(
-                    "button",
-                    {
-                      type: "button",
-                      style: iconButton,
-                      onClick: () => moveSlide(index, index - 1),
-                      disabled: index === 0,
-                      title: "D\xE9placer vers le haut",
-                      children: /* @__PURE__ */ jsx4("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ jsx4("path", { d: "M18 15l-6-6-6 6" }) })
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    "button",
-                    {
-                      type: "button",
-                      style: iconButton,
-                      onClick: () => moveSlide(index, index + 1),
-                      disabled: index === (hero.slides?.length ?? 0) - 1,
-                      title: "D\xE9placer vers le bas",
-                      children: /* @__PURE__ */ jsx4("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ jsx4("path", { d: "M6 9l6 6 6-6" }) })
-                    }
-                  ),
-                  /* @__PURE__ */ jsx4(
-                    "button",
-                    {
-                      type: "button",
-                      style: iconButton,
-                      onClick: () => removeSlide(slide.id),
-                      title: "Supprimer",
-                      children: /* @__PURE__ */ jsx4("svg", { width: "12", height: "12", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ jsx4("path", { d: "M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }) })
-                    }
-                  )
-                ] })
-              ]
-            },
-            slide.id
-          )) }),
-          /* @__PURE__ */ jsx4(
-            "button",
-            {
-              type: "button",
-              style: {
-                ...actionButton,
-                padding: "0.5rem 0.75rem",
-                fontSize: 13,
-                fontWeight: 500,
-                borderStyle: "dashed",
-                borderColor: "var(--pb-border)",
-                background: "var(--pb-bg)",
-                color: "var(--pb-text-muted)"
-              },
-              onClick: () => update({
-                slides: [
-                  ...hero.slides ?? [],
-                  { id: createId("slide"), title: "", subtitle: "", imageUrl: "", ctaText: "", ctaLink: "" }
-                ]
-              }),
-              children: "+ Ajouter un slide"
             }
           )
         ] }),
@@ -2867,7 +2544,7 @@ function PageBuilder({
   publishing = false
 }) {
   const { blocks, setBlocks, selectedId, setSelectedId } = useBuilderState(value);
-  const [activeTab, setActiveTab] = React3.useState("blocks");
+  const [activeTab, setActiveTab] = React2.useState("blocks");
   if (mode === "view") {
     return /* @__PURE__ */ jsx4(PageBuilderRenderer, { content: value ?? { blocks }, filterHidden: true });
   }
@@ -2876,13 +2553,6 @@ function PageBuilder({
   const emit = (next) => {
     setBlocks(next);
     onChange?.({ blocks: next, metadata: value?.metadata });
-  };
-  const emitFn = (fn) => {
-    setBlocks((prev) => {
-      const next = fn(prev);
-      onChange?.({ blocks: next, metadata: value?.metadata });
-      return next;
-    });
   };
   const emitWithMetadata = (metadata) => {
     onChange?.({ blocks, metadata });
@@ -2911,24 +2581,9 @@ function PageBuilder({
     if (from < 0 || to < 0 || from >= blocks.length || to >= blocks.length) return;
     emit(arrayMove(blocks, from, to));
   };
-  const selectedIdRef = React3.useRef(selectedId);
-  React3.useEffect(() => {
-    selectedIdRef.current = selectedId;
-  }, [selectedId]);
   const updateBlock = (updated) => {
-    if (typeof updated === "function") {
-      emitFn(
-        (prevBlocks) => prevBlocks.map((block) => {
-          if (block.id === selectedIdRef.current) {
-            return updated(block);
-          }
-          return block;
-        })
-      );
-    } else {
-      const next = blocks.map((block) => block.id === updated.id ? updated : block);
-      emit(next);
-    }
+    const next = blocks.map((block) => block.id === updated.id ? updated : block);
+    emit(next);
   };
   const toggleBlockVisibility = (id) => {
     const next = blocks.map(
